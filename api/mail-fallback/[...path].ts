@@ -8,8 +8,8 @@ export default async function handler(req: Request) {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS, PUT, PATCH',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Accept',
       },
     });
   }
@@ -27,14 +27,17 @@ export default async function handler(req: Request) {
     const search = url.search;
     const targetUrl = `https://api.mail.gw${subpath}${subpath.includes('?') ? '' : search}`;
 
-    const headers = new Headers();
-    headers.set('Content-Type', 'application/json');
-    headers.set('Origin', 'https://mail.gw');
-    headers.set('Referer', 'https://mail.gw/');
+    const headers: Record<string, string> = {
+      'Accept': 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      'Origin': 'https://mail.gw',
+      'Referer': 'https://mail.gw/',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    };
 
     const auth = req.headers.get('authorization');
     if (auth) {
-      headers.set('authorization', auth);
+      headers['authorization'] = auth;
     }
 
     const hasBody = req.method !== 'GET' && req.method !== 'HEAD';
@@ -46,18 +49,19 @@ export default async function handler(req: Request) {
       body: bodyText,
     });
 
-    const resHeaders = new Headers(upstreamRes.headers);
-    resHeaders.set('Access-Control-Allow-Origin', '*');
-    resHeaders.set('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
-    resHeaders.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    resHeaders.delete('content-encoding');
+    const responseBody = await upstreamRes.text();
 
-    return new Response(upstreamRes.body, {
+    return new Response(responseBody, {
       status: upstreamRes.status,
-      headers: resHeaders,
+      headers: {
+        'Content-Type': upstreamRes.headers.get('content-type') || 'application/json; charset=utf-8',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS, PUT, PATCH',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Accept',
+      },
     });
   } catch (err: any) {
-    return new Response(JSON.stringify({ error: err.message }), {
+    return new Response(JSON.stringify({ error: err.message || 'Upstream request failed' }), {
       status: 502,
       headers: {
         'Content-Type': 'application/json',
