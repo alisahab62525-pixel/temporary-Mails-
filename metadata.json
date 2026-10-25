@@ -1,0 +1,6 @@
+{
+  "name": "DakBox",
+  "description": "Real-time disposable temporary email service with automatic OTP detection, verification link extraction, dual fallback engine, and responsive UI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

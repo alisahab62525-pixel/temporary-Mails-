@@ -1,0 +1,3621 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>DakBox — Real-Time Disposable Temporary Email Service</title>
+  <meta name="description" content="DakBox is a fast, secure, and free disposable temporary email service with automatic OTP detection, verification link extraction, and real-time inbox sync." />
+  <meta property="og:title" content="DakBox — Real-Time Disposable Temporary Email" />
+  <meta property="og:description" content="Instant disposable email with automatic OTP and verification link detection. No registration, 100% private." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="DakBox" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="DakBox — Disposable Temporary Email" />
+  <meta name="twitter:description" content="Instant disposable email with automatic OTP detection and real-time updates." />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://api.mail.tm https://api.mail.gw blob: data:; img-src 'self' data: https: blob:; font-src 'self' https: data:; media-src 'self' blob: data:;" />
+
+  <!-- Favicon SVG Data URI -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2310b981'/%3E%3Cstop offset='100%25' stop-color='%2306b6d4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='%230f172a'/%3E%3Cpath d='M6 10a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3V10z' fill='none' stroke='url(%23g)' stroke-width='2'/%3E%3Cpath d='M6 11l10 7 10-7' fill='none' stroke='url(%23g)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpolygon points='16,13 13,19 16,17.5 19,19' fill='%23f59e0b'/%3E%3C/svg%3E" />
+
+  <style>
+    /* CSS Variables & Themes */
+    :root {
+      --font-en: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-ur: "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", "Urdu Typesetting", serif, system-ui;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-full: 9999px;
+      --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    [data-theme="dark"] {
+      --bg: #090d16;
+      --panel-bg: rgba(15, 23, 42, 0.78);
+      --panel-solid: #0f172a;
+      --panel-border: rgba(255, 255, 255, 0.09);
+      --panel-border-hover: rgba(255, 255, 255, 0.18);
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --text-muted: #64748b;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --accent-soft: rgba(16, 185, 129, 0.14);
+      --accent-glow: 0 0 20px rgba(16, 185, 129, 0.3);
+      --accent-contrast: #022c22;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --danger-soft: rgba(239, 68, 68, 0.12);
+      --warning: #f59e0b;
+      --warning-soft: rgba(245, 158, 11, 0.16);
+      --warning-text: #fbbf24;
+      --input-bg: rgba(2, 6, 23, 0.7);
+      --input-border: rgba(255, 255, 255, 0.12);
+      --hover-overlay: rgba(255, 255, 255, 0.04);
+      --active-item: rgba(16, 185, 129, 0.12);
+      --scrollbar-thumb: rgba(255, 255, 255, 0.18);
+    }
+
+    [data-theme="light"] {
+      --bg: #f1f5f9;
+      --panel-bg: rgba(255, 255, 255, 0.88);
+      --panel-solid: #ffffff;
+      --panel-border: rgba(0, 0, 0, 0.09);
+      --panel-border-hover: rgba(0, 0, 0, 0.2);
+      --text-main: #0f172a;
+      --text-sub: #475569;
+      --text-muted: #94a3b8;
+      --accent: #0d9488;
+      --accent-hover: #0f766e;
+      --accent-soft: rgba(13, 148, 136, 0.14);
+      --accent-glow: 0 0 20px rgba(13, 148, 136, 0.25);
+      --accent-contrast: #ffffff;
+      --danger: #dc2626;
+      --danger-hover: #b91c1c;
+      --danger-soft: rgba(220, 38, 38, 0.1);
+      --warning: #d97706;
+      --warning-soft: rgba(217, 119, 6, 0.14);
+      --warning-text: #b45309;
+      --input-bg: rgba(248, 250, 252, 0.95);
+      --input-border: rgba(0, 0, 0, 0.15);
+      --hover-overlay: rgba(0, 0, 0, 0.03);
+      --active-item: rgba(13, 148, 136, 0.1);
+      --scrollbar-thumb: rgba(0, 0, 0, 0.18);
+    }
+
+    /* Reset & Base */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-family: var(--font-en);
+      background-color: var(--bg);
+      color: var(--text-main);
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    html[lang="ur"] {
+      font-family: var(--font-ur);
+      font-size: 16.5px;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Directional overrides for LTR code/emails inside RTL mode */
+    .dir-ltr {
+      direction: ltr !important;
+      text-align: left !important;
+    }
+
+    /* Fallback animated gradient background behind canvas */
+    #bg-fallback {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 20% 20%, rgba(16, 185, 129, 0.1), transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.08), transparent 50%),
+                  var(--bg);
+      transition: background 0.5s ease;
+    }
+
+    #three-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Main Container & Layout */
+    .app-wrapper {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: clamp(12px, 3vw, 28px);
+      padding-top: max(clamp(12px, 3vw, 24px), env(safe-area-inset-top));
+      padding-bottom: max(32px, env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      flex: 1;
+    }
+
+    /* Glass Panels */
+    .glass-card {
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.25);
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .glass-card:hover {
+      border-color: var(--panel-border-hover);
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 22px;
+      border-radius: var(--radius-lg);
+    }
+
+    .brand-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .logo-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent) 0%, #06b6d4 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--accent-glow);
+      flex-shrink: 0;
+    }
+
+    .logo-icon svg {
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: #ffffff;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .brand-text h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .brand-text span {
+      color: var(--accent);
+    }
+
+    .brand-tagline {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Server Status Badge */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: var(--hover-overlay);
+      border: 1px solid var(--panel-border);
+      color: var(--text-sub);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      animation: pulse-dot 2s infinite;
+    }
+
+    .status-dot.switching {
+      background: var(--warning);
+      box-shadow: 0 0 8px var(--warning);
+    }
+
+    .status-dot.offline {
+      background: var(--danger);
+      box-shadow: 0 0 8px var(--danger);
+      animation: none;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* Icon Buttons */
+    .btn-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      background: var(--hover-overlay);
+      border: 1px solid var(--panel-border);
+      color: var(--text-sub);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .btn-icon:hover {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .btn-icon:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .btn-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: var(--transition);
+      text-decoration: none;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--accent-contrast);
+      box-shadow: var(--accent-glow);
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--hover-overlay);
+      border-color: var(--panel-border);
+      color: var(--text-main);
+    }
+    .btn-secondary:hover:not(:disabled) {
+      border-color: var(--panel-border-hover);
+      background: var(--panel-border);
+      transform: translateY(-1px);
+    }
+
+    .btn-danger {
+      background: var(--danger-soft);
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+    .btn-danger:hover:not(:disabled) {
+      background: var(--danger);
+      color: #ffffff;
+    }
+
+    .btn-sm {
+      min-height: 36px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      border-radius: var(--radius-sm);
+    }
+
+    /* Hero & Active Email Box */
+    .email-box {
+      padding: clamp(20px, 4vw, 32px);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .email-display-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .email-meta-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+    }
+
+    .timer-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      background: var(--warning-soft);
+      color: var(--warning-text);
+      font-size: 0.8rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+
+    .address-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--input-bg);
+      border: 2px dashed var(--accent);
+      border-radius: var(--radius-md);
+      padding: 12px 18px;
+      width: 100%;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .address-wrapper:hover {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+    }
+
+    .address-text {
+      font-family: var(--font-mono);
+      font-size: clamp(1rem, 2.5vw, 1.45rem);
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.01em;
+      word-break: break-all;
+      flex: 1;
+      user-select: all;
+    }
+
+    .copy-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent);
+      color: var(--accent-contrast);
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      flex-shrink: 0;
+      transition: var(--transition);
+    }
+
+    .email-actions-grid {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Custom Username Drawer / Section */
+    .custom-email-section {
+      border-top: 1px solid var(--panel-border);
+      padding-top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .custom-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      min-width: 240px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    .input-group:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-soft);
+    }
+
+    .custom-input {
+      flex: 1;
+      min-height: 44px;
+      padding: 8px 14px;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      font-family: var(--font-mono);
+    }
+
+    .at-domain-select {
+      background: var(--hover-overlay);
+      border: none;
+      border-inline-start: 1px solid var(--input-border);
+      color: var(--text-sub);
+      font-size: 0.9rem;
+      padding: 8px 12px;
+      min-height: 44px;
+      outline: none;
+      cursor: pointer;
+      font-family: var(--font-mono);
+    }
+
+    .custom-error-msg {
+      font-size: 0.8rem;
+      color: var(--danger);
+      display: none;
+    }
+    .custom-error-msg.visible {
+      display: block;
+    }
+
+    /* Main Workspace Layout (2 columns desktop, 1 col mobile) */
+    .inbox-workspace {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 20px;
+      min-height: 580px;
+    }
+
+    @media (max-width: 900px) {
+      .inbox-workspace {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Left Column: Messages List */
+    .inbox-list-col {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      height: 640px;
+    }
+
+    .list-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--panel-border);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .list-header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .inbox-count-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .list-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: var(--radius-sm);
+      padding: 6px 12px;
+      min-height: 40px;
+      transition: var(--transition);
+    }
+    .search-box:focus-within {
+      border-color: var(--accent);
+    }
+
+    .search-box input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-main);
+      font-size: 0.85rem;
+    }
+
+    .search-clear-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 2px;
+    }
+    .search-clear-btn.active {
+      display: flex;
+    }
+
+    /* Message List Scroll */
+    .messages-scroll {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .messages-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .messages-scroll::-webkit-scrollbar-thumb {
+      background: var(--scrollbar-thumb);
+      border-radius: 4px;
+    }
+
+    .message-item {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--panel-border);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .message-item:hover {
+      background: var(--hover-overlay);
+    }
+
+    .message-item.active {
+      background: var(--active-item);
+      border-inline-start: 4px solid var(--accent);
+    }
+
+    .message-item.unread .msg-subject {
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .message-item.unread::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      inset-inline-start: 8px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 6px var(--accent);
+    }
+
+    .msg-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .msg-sender {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-sub);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 220px;
+    }
+
+    .msg-date {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .msg-subject {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-main);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .msg-intro {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      line-height: 1.4;
+    }
+
+    .msg-badges-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+
+    .otp-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--warning-soft);
+      border: 1px solid var(--warning);
+      color: var(--warning-text);
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+    }
+
+    .link-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--accent-soft);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+    }
+
+    /* Empty state */
+    .empty-state {
+      padding: 40px 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex: 1;
+      color: var(--text-muted);
+    }
+
+    .empty-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--hover-overlay);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+    }
+    .empty-icon svg {
+      width: 28px;
+      height: 28px;
+      stroke-width: 1.5;
+    }
+
+    .empty-state p {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      max-width: 280px;
+    }
+
+    /* Right Column: Mail Viewer */
+    .mail-viewer-col {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      height: 640px;
+      position: relative;
+    }
+
+    .viewer-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 14px;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 30px;
+    }
+
+    .viewer-content {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .viewer-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--panel-border);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background: var(--panel-solid);
+    }
+
+    .viewer-top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .mobile-back-btn {
+      display: none;
+    }
+
+    @media (max-width: 900px) {
+      .mobile-back-btn {
+        display: inline-flex;
+      }
+      .inbox-workspace.viewing-mail .inbox-list-col {
+        display: none;
+      }
+      .inbox-workspace:not(.viewing-mail) .mail-viewer-col {
+        display: none;
+      }
+    }
+
+    .viewer-subject {
+      font-size: clamp(1.1rem, 2vw, 1.35rem);
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.3;
+      word-break: break-word;
+    }
+
+    .viewer-from-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      flex-wrap: wrap;
+    }
+
+    .from-pill {
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* Banners: OTP & Verification Link */
+    .otp-banner {
+      background: var(--warning-soft);
+      border: 1px solid var(--warning);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin: 14px 24px 0 24px;
+      flex-wrap: wrap;
+    }
+
+    .otp-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .otp-val {
+      font-family: var(--font-mono);
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      color: var(--warning-text);
+      user-select: all;
+    }
+
+    .link-banner {
+      background: var(--accent-soft);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius-md);
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 12px 24px 0 24px;
+      flex-wrap: wrap;
+    }
+
+    /* Attachments Row */
+    .attachments-container {
+      padding: 10px 24px;
+      border-bottom: 1px solid var(--panel-border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      background: var(--hover-overlay);
+    }
+
+    .attach-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: var(--input-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      cursor: pointer;
+      color: var(--text-main);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    .attach-chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Body Container */
+    .viewer-body-container {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      background: var(--panel-solid);
+    }
+
+    #mail-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      background: transparent;
+    }
+
+    #mail-plain-text {
+      width: 100%;
+      height: 100%;
+      padding: 24px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--text-main);
+      display: none;
+    }
+
+    /* Spin Animation */
+    .spin {
+      animation: spin-anim 0.8s linear infinite;
+    }
+    @keyframes spin-anim {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Informational & SEO Sections */
+    .info-sections {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      margin-top: 10px;
+    }
+
+    .section-card {
+      padding: clamp(24px, 4vw, 36px);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .section-heading {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .step-item {
+      background: var(--hover-overlay);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .step-number {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--accent-contrast);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+
+    .step-item h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .step-item p {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      line-height: 1.5;
+    }
+
+    /* FAQ Accordion */
+    .faq-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .faq-item {
+      background: var(--hover-overlay);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    .faq-question {
+      padding: 16px 20px;
+      width: 100%;
+      text-align: inherit;
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .faq-question svg {
+      width: 18px;
+      height: 18px;
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .faq-item.open .faq-question svg {
+      transform: rotate(180deg);
+    }
+
+    .faq-answer {
+      padding: 0 20px 16px 20px;
+      color: var(--text-sub);
+      font-size: 0.88rem;
+      line-height: 1.6;
+      display: none;
+    }
+
+    .faq-item.open .faq-answer {
+      display: block;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 20px;
+      padding: 24px 10px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .footer-note {
+      font-weight: 500;
+      color: var(--text-sub);
+    }
+
+    /* Modals & Popups */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(6px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.15s ease-out;
+    }
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--panel-solid);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .shortcuts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .shortcut-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.88rem;
+    }
+
+    kbd {
+      background: var(--hover-overlay);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-sm);
+      padding: 4px 8px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      box-shadow: 0 2px 0 var(--panel-border);
+    }
+
+    /* Toast system */
+    #toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    html[dir="rtl"] #toast-container {
+      right: auto;
+      left: 24px;
+    }
+
+    .toast {
+      background: var(--panel-solid);
+      border: 1px solid var(--panel-border);
+      color: var(--text-main);
+      padding: 12px 18px;
+      border-radius: var(--radius-md);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      font-size: 0.88rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      pointer-events: auto;
+      animation: slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      max-width: 360px;
+    }
+
+    .toast.success {
+      border-color: var(--accent);
+    }
+    .toast.error {
+      border-color: var(--danger);
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Print styles */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #print-area, #print-area * {
+        visibility: visible;
+      }
+      #print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: #ffffff;
+        color: #000000;
+        padding: 20px;
+      }
+      #bg-fallback, #three-canvas, header, .email-box, .inbox-list-col, .info-sections, footer {
+        display: none !important;
+      }
+    }
+  </style>
+
+  <!-- Three.js r128 Library from cdnjs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+  <!-- Fallback Background (CSS gradient mesh) -->
+  <div id="bg-fallback"></div>
+
+  <!-- Fullscreen 3D Canvas -->
+  <canvas id="three-canvas"></canvas>
+
+  <!-- App Wrapper -->
+  <div class="app-wrapper">
+    <!-- Header -->
+    <header class="glass-card" role="banner">
+      <a href="#" class="brand-area" aria-label="DakBox Home">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div class="brand-text">
+          <h1>Dak<span>Box</span></h1>
+          <div class="brand-tagline" data-i18n="tagline">Real-Time Temporary Disposable Email</div>
+        </div>
+      </a>
+
+      <div class="header-controls">
+        <!-- Server Status Badge -->
+        <div class="status-badge" id="server-status" title="API Connectivity State" aria-live="polite">
+          <span class="status-dot" id="status-dot"></span>
+          <span id="status-text">Server: Online</span>
+        </div>
+
+        <!-- Language Toggle -->
+        <button class="btn-icon" id="btn-lang" title="Toggle Language (English / اردو)" aria-label="Toggle Language">
+          <span id="lang-label" style="font-weight: 700; font-size: 0.85rem;">اردو</span>
+        </button>
+
+        <!-- Sound Toggle -->
+        <button class="btn-icon" id="btn-sound" title="Toggle Audio Chime" aria-label="Toggle Sound Alert">
+          <svg id="icon-sound-on" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          <svg id="icon-sound-off" viewBox="0 0 24 24" style="display:none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+        </button>
+
+        <!-- Notifications Toggle -->
+        <button class="btn-icon" id="btn-notify" title="Toggle Browser Notifications" aria-label="Toggle Browser Notifications">
+          <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button class="btn-icon" id="btn-theme" title="Toggle Dark/Light Theme" aria-label="Toggle Theme">
+          <svg id="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg id="icon-sun" viewBox="0 0 24 24" style="display:none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+
+        <!-- Shortcuts Help -->
+        <button class="btn-icon" id="btn-shortcuts" title="Keyboard Shortcuts" aria-label="Keyboard Shortcuts">
+          <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6" y2="8"/><line x1="10" y1="8" x2="10" y2="8"/><line x1="14" y1="8" x2="14" y2="8"/><line x1="18" y1="8" x2="18" y2="8"/><line x1="6" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="18" y2="12"/><line x1="8" y1="16" x2="16" y2="16"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Active Email Card -->
+    <section class="glass-card email-box" aria-label="Temporary Email Controls">
+      <div class="email-display-row">
+        <div class="email-meta-info">
+          <span data-i18n="your_temp_address">Your Temporary Email:</span>
+          <div class="timer-pill" id="timer-badge" title="Time remaining for this inbox">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span id="timer-text">10:00</span>
+          </div>
+          <button class="btn btn-sm btn-secondary" id="btn-extend-timer" title="Reset countdown to 10 minutes" data-i18n="extend_time">+10m</button>
+        </div>
+
+        <!-- History Selector Dropdown -->
+        <div style="display:flex; align-items:center; gap:8px;">
+          <select id="select-history" class="at-domain-select" style="border-radius: var(--radius-sm); border: 1px solid var(--input-border);" title="Switch to previous inboxes">
+            <option value="" data-i18n="inbox_history">Inbox History (Recent 5)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Big Clickable Address Box -->
+      <div class="address-wrapper dir-ltr" id="address-box" title="Click to copy email address">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent); flex-shrink:0;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <span class="address-text" id="email-address-text">Generating temporary email...</span>
+        <div class="copy-pill" id="copy-btn-inner">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span id="copy-label" data-i18n="copy">Copy</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons Row -->
+      <div class="email-actions-grid">
+        <button class="btn btn-primary" id="btn-copy-main" data-i18n="copy_email">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span data-i18n="copy_address">Copy Address</span>
+        </button>
+
+        <button class="btn btn-secondary" id="btn-new-random" data-i18n="new_random">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          <span data-i18n="new_random">New Random</span>
+        </button>
+
+        <button class="btn btn-secondary" id="btn-share" data-i18n="share">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          <span data-i18n="share">Share</span>
+        </button>
+
+        <button class="btn btn-danger" id="btn-delete-inbox" data-i18n="delete_inbox">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          <span data-i18n="delete_inbox">Delete Inbox</span>
+        </button>
+      </div>
+
+      <!-- Custom Username Creation Section -->
+      <div class="custom-email-section">
+        <label for="input-custom-username" style="font-size:0.85rem; font-weight:600; color:var(--text-sub);" data-i18n="custom_label">
+          Create Custom Email Address:
+        </label>
+        <div class="custom-row">
+          <div class="input-group dir-ltr">
+            <input type="text" id="input-custom-username" class="custom-input" placeholder="myname" maxlength="24" autocomplete="off" spellcheck="false" />
+            <select id="select-domain" class="at-domain-select" title="Choose domain">
+              <option value="">Loading domains...</option>
+            </select>
+          </div>
+          <button class="btn btn-secondary" id="btn-create-custom" data-i18n="create_custom">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            <span data-i18n="create">Create</span>
+          </button>
+        </div>
+        <div class="custom-error-msg" id="custom-error-msg">Invalid format: 3-24 characters, letters, numbers, dot, dash, underscore only.</div>
+      </div>
+    </section>
+
+    <!-- Main Workspace (Inbox List + Mail Viewer) -->
+    <main class="inbox-workspace" id="inbox-workspace" role="main">
+      <!-- Left Column: Messages List -->
+      <div class="glass-card inbox-list-col" aria-label="Messages List">
+        <div class="list-header">
+          <div class="list-header-top">
+            <div class="inbox-count-badge">
+              <span data-i18n="inbox">Inbox</span>
+              <span id="unread-count-badge" style="font-size:0.85rem; color:var(--accent); font-weight:700;">(0)</span>
+            </div>
+            <div class="list-actions">
+              <button class="btn-icon btn-sm" id="btn-refresh" title="Refresh Messages (R)" aria-label="Refresh Inbox">
+                <svg id="icon-refresh-svg" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              </button>
+              <button class="btn-icon btn-sm" id="btn-mark-all-read" title="Mark All as Read" aria-label="Mark all read">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              </button>
+              <button class="btn-icon btn-sm" id="btn-delete-all-mails" title="Delete All Messages" aria-label="Delete all messages">
+                <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Instant Search Box -->
+          <div class="search-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="search-input" placeholder="Search by sender or subject... (/)" aria-label="Search emails" />
+            <button class="search-clear-btn" id="search-clear-btn" title="Clear Search" aria-label="Clear Search">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Scrollable Messages Container -->
+        <div class="messages-scroll" id="messages-container" aria-live="polite">
+          <div class="empty-state" id="empty-state">
+            <div class="empty-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+            </div>
+            <p data-i18n="empty_state_text">
+              Copy this email, use it on any website, and the mail will appear here within seconds.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Email Viewer -->
+      <div class="glass-card mail-viewer-col" id="mail-viewer-col" aria-label="Email Viewer">
+        <!-- Default State when no email is selected -->
+        <div class="viewer-placeholder" id="viewer-placeholder">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="color:var(--text-muted);"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <h3 data-i18n="select_mail_title">No email selected</h3>
+          <p data-i18n="select_mail_desc">Click on any message from the inbox to read its contents, view OTPs, and download attachments.</p>
+        </div>
+
+        <!-- Selected Email Content View -->
+        <div class="viewer-content" id="viewer-content" style="display:none;">
+          <div class="viewer-header">
+            <div class="viewer-top-nav">
+              <button class="btn btn-sm btn-secondary mobile-back-btn" id="btn-back-inbox">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                <span data-i18n="back_to_inbox">Back</span>
+              </button>
+
+              <div style="display:flex; align-items:center; gap:8px; margin-inline-start:auto;">
+                <button class="btn btn-sm btn-secondary" id="btn-toggle-plain" title="Toggle Plain Text / HTML" data-i18n="plain_text">Plain text</button>
+                <button class="btn btn-sm btn-secondary" id="btn-export-txt" title="Export as .txt" data-i18n="export">Export .txt</button>
+                <button class="btn btn-sm btn-secondary" id="btn-print-mail" title="Print Email" data-i18n="print">Print</button>
+                <button class="btn btn-sm btn-danger" id="btn-delete-active-mail" title="Delete this email" data-i18n="delete">Delete</button>
+              </div>
+            </div>
+
+            <div class="viewer-subject" id="view-subject">Loading subject...</div>
+
+            <div class="viewer-from-row">
+              <div>
+                <span data-i18n="from">From:</span>
+                <span class="from-pill" id="view-from">Sender</span>
+              </div>
+              <div id="view-date" style="font-size:0.8rem; color:var(--text-muted);">Date & Time</div>
+            </div>
+          </div>
+
+          <!-- Highlighted OTP Banner (Shown if OTP detected) -->
+          <div class="otp-banner" id="otp-banner" style="display:none;">
+            <div class="otp-info">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--warning);"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <div>
+                <div style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:var(--warning-text);" data-i18n="detected_otp">Detected Verification Code</div>
+                <div class="otp-val dir-ltr" id="otp-value-text">123456</div>
+              </div>
+            </div>
+            <button class="btn btn-sm btn-primary" id="btn-copy-otp" style="background:var(--warning); color:#000;" data-i18n="copy_otp">
+              Copy OTP
+            </button>
+          </div>
+
+          <!-- Verification Link Banner (Shown if action URL detected) -->
+          <div class="link-banner" id="link-banner" style="display:none;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              <span style="font-size:0.85rem; font-weight:600;" data-i18n="verification_link_found">Verification / Activation link found</span>
+            </div>
+            <a href="#" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary" id="btn-open-link" data-i18n="open_link">
+              Open Link &nearr;
+            </a>
+          </div>
+
+          <!-- Attachments Row -->
+          <div class="attachments-container" id="attachments-row" style="display:none;">
+            <span style="font-size:0.8rem; font-weight:700; color:var(--text-muted);" data-i18n="attachments">Attachments:</span>
+            <div id="attachments-list" style="display:flex; gap:8px; flex-wrap:wrap;"></div>
+          </div>
+
+          <!-- Mail Body Container: Sandboxed iframe + Plain text pre -->
+          <div class="viewer-body-container">
+            <iframe id="mail-iframe" sandbox="" title="Email Content"></iframe>
+            <pre id="mail-plain-text"></pre>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Printable Content Container (Offscreen / Print media only) -->
+    <div id="print-area" style="display:none;">
+      <h2 id="print-subject"></h2>
+      <p><strong>From:</strong> <span id="print-from"></span></p>
+      <p><strong>Date:</strong> <span id="print-date"></span></p>
+      <hr style="margin: 15px 0;" />
+      <div id="print-body"></div>
+    </div>
+
+    <!-- Educational & SEO Sections: How it works & FAQ -->
+    <section class="info-sections" aria-label="Information & FAQ">
+      <!-- How it Works -->
+      <article class="glass-card section-card">
+        <h2 class="section-heading">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span data-i18n="how_it_works_title">How DakBox Works</span>
+        </h2>
+        <div class="steps-grid">
+          <div class="step-item">
+            <div class="step-number">1</div>
+            <h3 data-i18n="step1_title">Instant Free Inbox</h3>
+            <p data-i18n="step1_desc">A fresh disposable email is automatically created the moment you open the app. You can also pick from active domains or choose a custom username.</p>
+          </div>
+          <div class="step-item">
+            <div class="step-number">2</div>
+            <h3 data-i18n="step2_title">Receive Real Emails &amp; OTPs</h3>
+            <p data-i18n="step2_desc">Use your temporary address on any service. DakBox polls in real-time, extracts 4-8 digit verification codes (OTPs), and isolates verification links for one-click access.</p>
+          </div>
+          <div class="step-item">
+            <div class="step-number">3</div>
+            <h3 data-i18n="step3_title">Zero Logs &amp; Auto-Purge</h3>
+            <p data-i18n="step3_desc">No registration, passwords, or personal trackers. Once your 10-minute timer finishes (or upon manual deletion), all communications are permanently deleted.</p>
+          </div>
+        </div>
+      </article>
+
+      <!-- FAQ Section -->
+      <article class="glass-card section-card">
+        <h2 class="section-heading">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span data-i18n="faq_title">Frequently Asked Questions</span>
+        </h2>
+
+        <div class="faq-grid" id="faq-container">
+          <!-- FAQ 1 -->
+          <div class="faq-item">
+            <button class="faq-question">
+              <span data-i18n="faq_q1">Is DakBox completely free to use?</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer" data-i18n="faq_a1">
+              Yes, DakBox is 100% free with unlimited disposable inboxes. There are no paywalls, registration steps, or subscription fees.
+            </div>
+          </div>
+
+          <!-- FAQ 2 -->
+          <div class="faq-item">
+            <button class="faq-question">
+              <span data-i18n="faq_q2">How long do temporary inboxes and emails last?</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer" data-i18n="faq_a2">
+              Inboxes are active for 10 minutes by default. You can easily extend the countdown by clicking "+10m" at any time. When the timer expires or you delete the inbox, all messages are permanently erased.
+            </div>
+          </div>
+
+          <!-- FAQ 3 -->
+          <div class="faq-item">
+            <button class="faq-question">
+              <span data-i18n="faq_q3">Why did a website or service not deliver the email?</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer" data-i18n="faq_a3">
+              Some websites maintain strict blocklists that filter known temporary email provider domains. If an email does not arrive after 30 seconds, try generating an email with another active domain from our domain dropdown.
+            </div>
+          </div>
+
+          <!-- FAQ 4 -->
+          <div class="faq-item">
+            <button class="faq-question">
+              <span data-i18n="faq_q4">Can I send emails from DakBox?</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer" data-i18n="faq_a4">
+              No. DakBox is strictly a receive-only temporary email service. Sending capabilities are disabled to safeguard domain reputation and prevent spam abuse.
+            </div>
+          </div>
+
+          <!-- FAQ 5 -->
+          <div class="faq-item">
+            <button class="faq-question">
+              <span data-i18n="faq_q5">Is DakBox safe and private?</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer" data-i18n="faq_a5">
+              Yes. No personal identifiable information (PII), cookies, or IP addresses are logged by DakBox. Untrusted mail HTML is rendered inside a secure sandboxed iframe where external scripts and forms are strictly blocked.
+            </div>
+          </div>
+
+          <!-- FAQ 6 -->
+          <div class="faq-item">
+            <button class="faq-question">
+              <span data-i18n="faq_q6">Which services block temporary emails?</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer" data-i18n="faq_a6">
+              Certain financial institutions, major government portals, and sensitive services (e.g. banking, tax agencies) reject temporary email domains. Always use your personal permanent email for critical banking or medical communications.
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Privacy & Terms Notice -->
+      <article class="glass-card section-card">
+        <h2 class="section-heading">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span data-i18n="privacy_terms_title">Privacy Notice &amp; Terms of Service</span>
+        </h2>
+        <div style="font-size:0.88rem; color:var(--text-sub); line-height:1.6; display:flex; flex-direction:column; gap:10px;">
+          <p><strong style="color:var(--text-main);" data-i18n="privacy_note_heading">Privacy Note:</strong> <span data-i18n="privacy_note_text">No personal information is stored on our servers. Your inbox credentials live in your local browser and on the decentralized mail API infrastructure. Emails are automatically purged upon expiry.</span></p>
+          <p><strong style="color:var(--text-main);" data-i18n="terms_note_heading">Terms of Use:</strong> <span data-i18n="terms_note_text">Do not use DakBox for illegal activity, fraud, phishing, or spam. Do not use temporary email for bank accounts, primary email recovery, or mission-critical credentials.</span></p>
+        </div>
+      </article>
+    </section>
+
+    <!-- Footer -->
+    <footer role="contentinfo">
+      <div class="footer-note" data-i18n="footer_blocking_note">Notice: Some websites block temporary email domains.</div>
+      <div>&copy; 2026 DakBox &mdash; Real-Time Disposable Temporary Email Service. All rights reserved.</div>
+    </footer>
+  </div>
+
+  <!-- Keyboard Shortcuts Modal -->
+  <div class="modal-overlay" id="shortcuts-modal" role="dialog" aria-modal="true" aria-labelledby="modal-shortcuts-title">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-shortcuts-title" data-i18n="shortcuts_title">Keyboard Shortcuts</h3>
+        <button class="btn-icon btn-sm" id="btn-close-shortcuts" aria-label="Close shortcuts">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="shortcuts-list">
+        <div class="shortcut-row">
+          <span data-i18n="sc_copy">Copy Email Address</span>
+          <kbd>C</kbd>
+        </div>
+        <div class="shortcut-row">
+          <span data-i18n="sc_refresh">Refresh Messages</span>
+          <kbd>R</kbd>
+        </div>
+        <div class="shortcut-row">
+          <span data-i18n="sc_new">Create New Random Email</span>
+          <kbd>N</kbd>
+        </div>
+        <div class="shortcut-row">
+          <span data-i18n="sc_search">Focus Search Box</span>
+          <kbd>/</kbd>
+        </div>
+        <div class="shortcut-row">
+          <span data-i18n="sc_esc">Close Mail / Dismiss</span>
+          <kbd>Esc</kbd>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Delete Inbox Modal -->
+  <div class="modal-overlay" id="confirm-delete-modal" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <h3 class="modal-title" data-i18n="confirm_delete_title">Delete Temporary Inbox?</h3>
+      <p style="font-size:0.9rem; color:var(--text-sub); line-height:1.5;" data-i18n="confirm_delete_desc">
+        Are you sure you want to permanently delete this inbox and all received messages? A fresh email address will be created automatically.
+      </p>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
+        <button class="btn btn-secondary" id="btn-cancel-delete" data-i18n="cancel">Cancel</button>
+        <button class="btn btn-danger" id="btn-confirm-delete" data-i18n="delete">Delete &amp; Renew</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" aria-live="polite"></div>
+
+  <!-- Main JavaScript Application Engine -->
+  <script>
+    /**
+     * DakBox Single-File Real Working Temporary Email Engine
+     * Fully compliant with all specifications, dual-provider fallback,
+     * rate limiter queue, OTP/link extraction, Three.js 3D background, and i18n.
+     */
+
+    // --- 1. INTERNATIONALIZATION (I18N) DICTIONARY ---
+    const I18N = {
+      en: {
+        tagline: "Real-Time Temporary Disposable Email",
+        server_online: "Server: Online",
+        server_switching: "Server: Switching server...",
+        server_offline: "Server: Offline",
+        your_temp_address: "Your Temporary Email:",
+        extend_time: "+10m",
+        inbox_history: "Inbox History (Recent 5)",
+        copy: "Copy",
+        copied: "Copied!",
+        copy_email: "Copy Address",
+        copy_address: "Copy Address",
+        new_random: "New Random",
+        share: "Share",
+        delete_inbox: "Delete Inbox",
+        custom_label: "Create Custom Email Address:",
+        create_custom: "Create",
+        create: "Create",
+        inbox: "Inbox",
+        plain_text: "Plain text",
+        html_view: "HTML view",
+        export: "Export .txt",
+        print: "Print",
+        delete: "Delete",
+        back_to_inbox: "Back",
+        detected_otp: "Detected Verification Code",
+        copy_otp: "Copy OTP",
+        verification_link_found: "Verification / Activation link found",
+        open_link: "Open Link ↗",
+        attachments: "Attachments:",
+        select_mail_title: "No email selected",
+        select_mail_desc: "Click on any message from the inbox to read its contents, view OTPs, and download attachments.",
+        empty_state_text: "Copy this email, use it on any website, and the mail will appear here within seconds.",
+        how_it_works_title: "How DakBox Works",
+        step1_title: "Instant Free Inbox",
+        step1_desc: "A fresh disposable email is automatically created the moment you open the app. You can also pick from active domains or choose a custom username.",
+        step2_title: "Receive Real Emails & OTPs",
+        step2_desc: "Use your temporary address on any service. DakBox polls in real-time, extracts 4-8 digit verification codes (OTPs), and isolates verification links for one-click access.",
+        step3_title: "Zero Logs & Auto-Purge",
+        step3_desc: "No registration, passwords, or personal trackers. Once your 10-minute timer finishes (or upon manual deletion), all communications are permanently deleted.",
+        faq_title: "Frequently Asked Questions",
+        faq_q1: "Is DakBox completely free to use?",
+        faq_a1: "Yes, DakBox is 100% free with unlimited disposable inboxes. There are no paywalls, registration steps, or subscription fees.",
+        faq_q2: "How long do temporary inboxes and emails last?",
+        faq_a2: "Inboxes are active for 10 minutes by default. You can easily extend the countdown by clicking '+10m' at any time. When the timer expires or you delete the inbox, all messages are permanently erased.",
+        faq_q3: "Why did a website or service not deliver the email?",
+        faq_a3: "Some websites maintain strict blocklists that filter known temporary email provider domains. If an email does not arrive after 30 seconds, try generating an email with another active domain from our domain dropdown.",
+        faq_q4: "Can I send emails from DakBox?",
+        faq_a4: "No. DakBox is strictly a receive-only temporary email service. Sending capabilities are disabled to safeguard domain reputation and prevent spam abuse.",
+        faq_q5: "Is DakBox safe and private?",
+        faq_a5: "Yes. No personal identifiable information (PII), cookies, or IP addresses are logged by DakBox. Untrusted mail HTML is rendered inside a secure sandboxed iframe where external scripts and forms are strictly blocked.",
+        faq_q6: "Which services block temporary emails?",
+        faq_a6: "Certain financial institutions, major government portals, and sensitive services (e.g. banking, tax agencies) reject temporary email domains. Always use your personal permanent email for critical banking or medical communications.",
+        privacy_terms_title: "Privacy Notice & Terms of Service",
+        privacy_note_heading: "Privacy Note:",
+        privacy_note_text: "No personal information is stored on our servers. Your inbox credentials live in your local browser and on the decentralized mail API infrastructure. Emails are automatically purged upon expiry.",
+        terms_note_heading: "Terms of Use:",
+        terms_note_text: "Do not use DakBox for illegal activity, fraud, phishing, or spam. Do not use temporary email for bank accounts, primary email recovery, or mission-critical credentials.",
+        footer_blocking_note: "Notice: Some websites block temporary email domains.",
+        shortcuts_title: "Keyboard Shortcuts",
+        sc_copy: "Copy Email Address",
+        sc_refresh: "Refresh Messages",
+        sc_new: "Create New Random Email",
+        sc_search: "Focus Search Box",
+        sc_esc: "Close Mail / Dismiss",
+        confirm_delete_title: "Delete Temporary Inbox?",
+        confirm_delete_desc: "Are you sure you want to permanently delete this inbox and all received messages? A fresh email address will be created automatically.",
+        cancel: "Cancel",
+        new_mail_toast: "New mail received:",
+        otp_copied: "OTP copied to clipboard!",
+        inbox_expired_toast: "Inbox expired. A fresh inbox has been created.",
+        search_placeholder: "Search by sender or subject... (/)",
+        from: "From:"
+      },
+      ur: {
+        tagline: "فوری اور محفوظ عارضی ای میل سروس",
+        server_online: "سرور: آن لائن",
+        server_switching: "سرور: تبدیل ہو رہا ہے...",
+        server_offline: "سرور: آف لائن",
+        your_temp_address: "آپ کا عارضی ای میل:",
+        extend_time: "+10 منٹ",
+        inbox_history: "سابقہ ای میلز (آخری 5)",
+        copy: "کاپی",
+        copied: "کاپی ہو گیا!",
+        copy_email: "پتہ کاپی کریں",
+        copy_address: "پتہ کاپی کریں",
+        new_random: "نیا پتہ",
+        share: "شیئر",
+        delete_inbox: "ان باکس ختم کریں",
+        custom_label: "اپنی مرضی کا ای میل پتہ بنائیں:",
+        create_custom: "بنائیں",
+        create: "بنائیں",
+        inbox: "ان باکس",
+        plain_text: "سادہ متن",
+        html_view: "ایچ ٹی ایم ایل",
+        export: "ڈاؤن لوڈ txt",
+        print: "پرنٹ کریں",
+        delete: "حذف کریں",
+        back_to_inbox: "واپس",
+        detected_otp: "شناخت شدہ او ٹی پی (OTP) کوڈ",
+        copy_otp: "او ٹی پی کاپی کریں",
+        verification_link_found: "تصدیقی / ایکٹیویشن لنک مل گیا",
+        open_link: "لنک کھولیں ↗",
+        attachments: "منسلکات:",
+        select_mail_title: "کوئی ای میل منتخب نہیں ہے",
+        select_mail_desc: "ان باکس سے کسی بھی پیغام پر کلک کر کے اس کا متن، او ٹی پی کوڈ اور اٹیچمنٹس دیکھیں۔",
+        empty_state_text: "اس ای میل ایڈریس کو کاپی کریں اور کسی بھی ویب سائٹ پر استعمال کریں۔ آنے والی ای میل چند سیکنڈوں میں یہاں ظاہر ہو جائے گی۔",
+        how_it_works_title: "ڈاک باکس کیسے کام کرتا ہے؟",
+        step1_title: "فوری اور مفت ان باکس",
+        step1_desc: "جیسے ہی آپ ایپ کھولتے ہیں، ایک نیا عارضی ای میل خود بخود بن جاتا ہے۔ آپ دستیاب ڈومینز میں سے بھی منتخب کر سکتے ہیں۔",
+        step2_title: "حقیقی ای میل اور او ٹی پی وصول کریں",
+        step2_desc: "کسی بھی ویب سائٹ پر یہ پتہ درج کریں۔ ڈاک باکس خودکار طریقے سے 4 سے 8 ہندسوں کے او ٹی پی کوڈز اور تصدیقی لنکس فوری نکالتا ہے۔",
+        step3_title: "مکمل رازداری اور خودکار خاتمہ",
+        step3_desc: "نہ کوئی رجسٹریشن، نہ پاس ورڈ اور نہ ہی ٹریکنگ۔ 10 منٹ کا وقت ختم ہونے پر سارا ڈیٹا مستقل حذف کر دیا جاتا ہے۔",
+        faq_title: "اکثر پوچھے جانے والے سوالات",
+        faq_q1: "کیا ڈاک باکس بالکل مفت ہے؟",
+        faq_a1: "جی ہاں، ڈاک باکس غیر محدود عارضی ان باکسز کے ساتھ مکمل طور پر مفت ہے۔ کسی اکاؤنٹ یا فیس کی ضرورت نہیں۔",
+        faq_q2: "عارضی ان باکس کتنی دیر فعال رہتا ہے؟",
+        faq_a2: "ہر ان باکس عام طور پر 10 منٹ فعال رہتا ہے۔ آپ '+10 منٹ' پر کلک کر کے اس مدت کو بڑھا سکتے ہیں۔ وقت ختم ہونے پر سارا ڈیٹا مٹ جاتا ہے۔",
+        faq_q3: "کسی ویب سائٹ سے ای میل کیوں موصول نہیں ہوئی؟",
+        faq_a3: "کچھ ویب سائٹس عارضی ای میل ڈومینز کو بلاک کرتی ہیں۔ اگر 30 سیکنڈ میں ای میل نہ آئے تو ڈراپ ڈاؤن سے دوسری ڈومین چن کر نیا پتہ بنائیں۔",
+        faq_q4: "کیا میں ڈاک باکس سے ای میل بھیج سکتا ہوں؟",
+        faq_a4: "نہیں۔ ڈاک باکس صرف ای میل موصول کرنے کے لیے بنایا گیا ہے تاکہ سپیم اور غلط استعمال سے بچا جا سکے۔",
+        faq_q5: "کیا یہ محفوظ اور نجی ہے؟",
+        faq_a5: "جی ہاں۔ کوئی ذاتی معلومات محفوظ نہیں کی جاتیں۔ ای میلز کو محفوظ سینڈ باکس میں دکھایا جاتا ہے جہاں بیرونی سکرپٹ نہیں چل سکتے۔",
+        faq_q6: "کون سی ویب سائٹس عارضی ای میل کو مسترد کرتی ہیں؟",
+        faq_a6: "بینک، مالیاتی ادارے اور سرکاری ایجنسیاں عارضی ای میل ڈومینز کو بلاک کرتی ہیں۔ اہم مقاصد کے لیے ہمیشہ اپنی ذاتی ای میل استعمال کریں۔",
+        privacy_terms_title: "رازداری کی پالیسی اور شرائط",
+        privacy_note_heading: "رازداری:",
+        privacy_note_text: "ہماری جانب سے کوئی ذاتی ڈیٹا جمع نہیں کیا جاتا۔ آپ کا ان باکس آپ کے براؤزر اور محفوظ میل نیٹ ورک پر عارضی رہتا ہے اور ختم کر دیا جاتا ہے۔",
+        terms_note_heading: "استعمال کی شرائط:",
+        terms_note_text: "ڈاک باکس کو کسی بھی غیر قانونی سرگرمی، فراڈ یا سپیم کے لیے استعمال نہ کریں۔ بینک یا حساس اکاؤنٹس کے لیے عارضی ای میل مت استعمال کریں۔",
+        footer_blocking_note: "نوٹ: کچھ ویب سائٹس عارضی ای میل ڈومینز کو بلاک کرتی ہیں۔",
+        shortcuts_title: "کی بورڈ شارٹ کٹس",
+        sc_copy: "ای میل ایڈریس کاپی کریں",
+        sc_refresh: "پیغامات ریفریش کریں",
+        sc_new: "نیا بے ترتیب ای میل بنائیں",
+        sc_search: "سرچ باکس کھولیں",
+        sc_esc: "پیغام بند کریں / واپس جائیں",
+        confirm_delete_title: "عارضی ان باکس حذف کریں؟",
+        confirm_delete_desc: "کیا آپ واقعی یہ ان باکس اور موصولہ پیغامات حذف کرنا چاہتے ہیں؟ نیا ای میل پتہ خود بخود بن جائے گا۔",
+        cancel: "منسوخ",
+        new_mail_toast: "نئی ای میل موصول ہوئی:",
+        otp_copied: "او ٹی پی کلپ بورڈ پر کاپی ہو گیا!",
+        inbox_expired_toast: "ان باکس کی مدت ختم ہو گئی۔ نیا ان باکس تیار کر دیا گیا ہے۔",
+        search_placeholder: "فرستندہ یا عنوان سے تلاش کریں... (/)",
+        from: "از طرف:"
+      }
+    };
+
+    // --- 2. GLOBAL APPLICATION STATE ---
+    const state = {
+      lang: 'en',
+      theme: 'dark',
+      soundEnabled: true,
+      notificationsEnabled: false,
+      activeProvider: 'primary', // 'primary' (mail.tm) or 'fallback' (mail.gw)
+      serverStatus: 'online', // 'online' | 'switching' | 'offline'
+      inbox: null, // { address, password, token, accountId, createdAt, timerExpiresAt }
+      domains: [],
+      messages: [],
+      selectedMessage: null,
+      selectedMessageDetails: null,
+      searchQuery: '',
+      history: [],
+      timerSeconds: 600, // 10 minutes default
+      timerInterval: null,
+      pollingInterval: null,
+      isPolling: false,
+      isCreatingAccount: false,
+      isViewPlain: false
+    };
+
+    // --- 3. PERSISTENCE IN LOCALSTORAGE (WITH IN-MEMORY FALLBACK) ---
+    const Storage = {
+      get(key, defaultVal = null) {
+        try {
+          const val = localStorage.getItem('dakbox_' + key);
+          return val ? JSON.parse(val) : defaultVal;
+        } catch (e) {
+          return defaultVal;
+        }
+      },
+      set(key, val) {
+        try {
+          localStorage.setItem('dakbox_' + key, JSON.stringify(val));
+        } catch (e) {
+          // Fallback to in-memory silently
+        }
+      },
+      remove(key) {
+        try {
+          localStorage.removeItem('dakbox_' + key);
+        } catch (e) {}
+      }
+    };
+
+    // --- 4. REQUEST QUEUE & RATE LIMITER WITH BACKOFF & TIMEOUT ---
+    class RequestQueue {
+      constructor(spacingMs = 150) {
+        this.spacingMs = spacingMs;
+        this.queue = [];
+        this.processing = false;
+      }
+
+      enqueue(fetchFn) {
+        return new Promise((resolve, reject) => {
+          this.queue.push({ fetchFn, resolve, reject, retries: 0 });
+          this.process();
+        });
+      }
+
+      async process() {
+        if (this.processing || this.queue.length === 0) return;
+        this.processing = true;
+
+        const item = this.queue.shift();
+        try {
+          const result = await item.fetchFn();
+          item.resolve(result);
+        } catch (err) {
+          // Handle rate limit 429 exponential backoff: 1s, 2s, 4s
+          if (err && err.status === 429 && item.retries < 3) {
+            item.retries++;
+            const delay = Math.pow(2, item.retries - 1) * 1000;
+            console.warn(`[DakBox] 429 Rate limit encountered. Retrying in ${delay}ms (attempt ${item.retries}/3)`);
+            await new Promise(r => setTimeout(r, delay));
+            this.queue.unshift(item); // Reinsert at front of queue
+          } else {
+            item.reject(err);
+          }
+        } finally {
+          await new Promise(r => setTimeout(r, this.spacingMs));
+          this.processing = false;
+          this.process();
+        }
+      }
+    }
+
+    const requestQueue = new RequestQueue(150);
+
+    // Safe Fetch with AbortController 10s timeout
+    async function safeFetch(url, options = {}, timeoutMs = 10000) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+      try {
+        const response = await fetch(url, {
+          ...options,
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          const error = new Error(`HTTP Error ${response.status}: ${response.statusText}`);
+          error.status = response.status;
+          try {
+            error.data = await response.json();
+          } catch (e) {
+            error.data = null;
+          }
+          throw error;
+        }
+
+        if (response.status === 204) return null; // No Content
+        return await response.json();
+      } catch (err) {
+        clearTimeout(timeoutId);
+        if (err.name === 'AbortError') {
+          const timeoutErr = new Error('Request timed out after 10 seconds');
+          timeoutErr.status = 408;
+          throw timeoutErr;
+        }
+        throw err;
+      }
+    }
+
+    // --- 5. DUAL EMAIL ENGINE PROVIDER LAYER (mail.tm & mail.gw) ---
+    const Provider = {
+      hosts: {
+        primary: {
+          proxy: '/api/mail-primary',
+          direct: 'https://api.mail.tm'
+        },
+        fallback: {
+          proxy: '/api/mail-fallback',
+          direct: 'https://api.mail.gw'
+        }
+      },
+      // In web app, default to using proxy to avoid browser CORS restrictions on third-party origins
+      useProxy: window.location.protocol.startsWith('http'),
+
+      getBaseUrl() {
+        const item = this.hosts[state.activeProvider];
+        return this.useProxy ? item.proxy : item.direct;
+      },
+
+      async switchFallback() {
+        if (state.activeProvider === 'primary') {
+          console.warn('[DakBox] Primary provider (mail.tm) unreachable. Switching to fallback (mail.gw)...');
+          state.activeProvider = 'fallback';
+          updateServerStatus('switching');
+          showToast(t('server_switching'), 'info');
+          await new Promise(r => setTimeout(r, 600));
+          updateServerStatus('online');
+        } else {
+          console.warn('[DakBox] Both providers encountered issues.');
+          updateServerStatus('offline');
+        }
+      },
+
+      async request(endpoint, method = 'GET', body = null, requireAuth = true) {
+        if (!navigator.onLine) {
+          updateServerStatus('offline');
+          throw new Error('Device is offline');
+        }
+
+        const makeCall = async () => {
+          const headers = { 'Content-Type': 'application/json' };
+          if (requireAuth && state.inbox && state.inbox.token) {
+            headers['Authorization'] = `Bearer ${state.inbox.token}`;
+          }
+
+          let url = `${this.getBaseUrl()}${endpoint}`;
+          const options = { method, headers };
+          if (body) options.body = JSON.stringify(body);
+
+          try {
+            return await safeFetch(url, options);
+          } catch (err) {
+            // If proxy is active and returns 404 or 405 (e.g. static hosting without backend proxy), fallback to direct API
+            if (this.useProxy && (err.status === 404 || err.status === 405)) {
+              console.warn('[DakBox] Proxy unavailable on this host, falling back to direct API...');
+              this.useProxy = false;
+              url = `${this.getBaseUrl()}${endpoint}`;
+              return await safeFetch(url, options);
+            }
+
+            // Check for 401 Unauthorized -> Silent Re-login
+            if (err && err.status === 401 && requireAuth && state.inbox) {
+              console.log('[DakBox] Token expired (401). Silently re-logging in...');
+              try {
+                const newToken = await Provider.getToken(state.inbox.address, state.inbox.password);
+                state.inbox.token = newToken.token;
+                Storage.set('inbox', state.inbox);
+                headers['Authorization'] = `Bearer ${newToken.token}`;
+                return await safeFetch(url, options);
+              } catch (reloginErr) {
+                console.error('[DakBox] Silent re-login failed. Regenerating inbox.', reloginErr);
+                showToast(t('inbox_expired_toast'), 'error');
+                await createNewInbox();
+                throw reloginErr;
+              }
+            }
+
+            // Check for Server Error (5xx) or Network failure -> Switch Fallback
+            if (!err.status || err.status >= 500) {
+              await this.switchFallback();
+              // Retry on the new fallback provider
+              const fallbackUrl = `${this.getBaseUrl()}${endpoint}`;
+              return await safeFetch(fallbackUrl, options);
+            }
+
+            throw err;
+          }
+        };
+
+        return requestQueue.enqueue(makeCall);
+      },
+
+      async getDomains() {
+        const data = await this.request('/domains?page=1', 'GET', null, false);
+        return data && data['hydra:member'] ? data['hydra:member'] : [];
+      },
+
+      async createAccount(address, password) {
+        return await this.request('/accounts', 'POST', { address, password }, false);
+      },
+
+      async getToken(address, password) {
+        return await this.request('/token', 'POST', { address, password }, false);
+      },
+
+      async listMessages(page = 1) {
+        const data = await this.request(`/messages?page=${page}`, 'GET', null, true);
+        return data && data['hydra:member'] ? data['hydra:member'] : [];
+      },
+
+      async getMessage(id) {
+        return await this.request(`/messages/${id}`, 'GET', null, true);
+      },
+
+      async deleteMessage(id) {
+        return await this.request(`/messages/${id}`, 'DELETE', null, true);
+      },
+
+      async deleteAccount(id) {
+        return await this.request(`/accounts/${id}`, 'DELETE', null, true);
+      },
+
+      async downloadAttachment(url, filename) {
+        try {
+          const fullUrl = url.startsWith('http') ? url : `${this.getBaseUrl()}${url}`;
+          const headers = {};
+          if (state.inbox && state.inbox.token) {
+            headers['Authorization'] = `Bearer ${state.inbox.token}`;
+          }
+
+          const response = await fetch(fullUrl, { headers });
+          if (!response.ok) throw new Error('Attachment fetch failed');
+          const blob = await response.blob();
+          const blobUrl = URL.createObjectURL(blob);
+
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          a.download = filename || 'attachment';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+        } catch (e) {
+          console.error('[DakBox] Failed to download attachment:', e);
+          showToast('Failed to download attachment', 'error');
+        }
+      }
+    };
+
+    // --- 6. OTP & VERIFICATION LINK EXTRACTION LOGIC ---
+    function extractOtp(subject, intro, textBody, htmlBody) {
+      const cleanHtml = (htmlBody || '').replace(/<[^>]+>/g, ' ');
+      const combined = `${subject || ''} ${intro || ''} ${textBody || ''} ${cleanHtml}`
+        // Remove URLs so digits in queries or URLs aren't mistaken for OTPs
+        .replace(/https?:\/\/[^\s]+/gi, ' ')
+        // Remove email addresses
+        .replace(/[\w.+-]+@[\w-]+\.[\w.-]+/g, ' ');
+
+      // Contextual match first: "code is 123456", "OTP: 948-201", "verification code: 492019"
+      const contextRegex = /(?:code|otp|pin|verification|password|verify|passcode|confirm)\s*(?:is|:|-|\=)?\s*([0-9]{3,4}[- ]?[0-9]{3,4}|[0-9]{4,8})\b/i;
+      const contextMatch = combined.match(contextRegex);
+      if (contextMatch && contextMatch[1]) {
+        const raw = contextMatch[1].trim();
+        const cleaned = raw.replace(/[- ]/g, '');
+        // Exclude standalone years 1900-2099
+        if (!(cleaned.length === 4 && (cleaned.startsWith('19') || cleaned.startsWith('20')))) {
+          return raw;
+        }
+      }
+
+      // Standalone general format match: 4 to 8 digits, e.g. 1234, 123-456, 123 456
+      const generalRegex = /\b([0-9]{3,4}[- ][0-9]{3,4}|[0-9]{4,8})\b/g;
+      const matches = combined.match(generalRegex);
+      if (matches) {
+        for (const match of matches) {
+          const cleaned = match.replace(/[- ]/g, '');
+          if (cleaned.length === 4 && (cleaned.startsWith('19') || cleaned.startsWith('20'))) {
+            continue; // Skip year
+          }
+          return match;
+        }
+      }
+      return null;
+    }
+
+    function extractVerificationLink(textBody, htmlBody) {
+      const urls = [];
+      if (htmlBody) {
+        const hrefRegex = /href=["'](https?:\/\/[^"'>]+)["']/gi;
+        let match;
+        while ((match = hrefRegex.exec(htmlBody)) !== null) {
+          urls.push(match[1]);
+        }
+      }
+      const urlRegex = /(https?:\/\/[^\s<>"']+)/gi;
+      const textUrls = (textBody || '').match(urlRegex) || [];
+      urls.push(...textUrls);
+
+      const keywords = ['verify', 'verification', 'confirm', 'confirmation', 'activate', 'activation', 'reset', 'token', 'auth', 'magic', 'validate'];
+
+      for (const rawUrl of urls) {
+        const cleanUrl = rawUrl.replace(/&amp;/g, '&');
+        const lower = cleanUrl.toLowerCase();
+        if (lower.includes('unsubscribe') || lower.includes('.png') || lower.includes('.jpg') || lower.includes('.css')) {
+          continue;
+        }
+        if (keywords.some(k => lower.includes(k))) {
+          return cleanUrl;
+        }
+      }
+      return null;
+    }
+
+    // --- 7. WEBAUDIO SOUND SYNTHESIZER ---
+    let audioCtx = null;
+    function playNewMailChime() {
+      if (!state.soundEnabled) return;
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const now = audioCtx.currentTime;
+        const osc1 = audioCtx.createOscillator();
+        const osc2 = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(587.33, now); // D5
+        osc1.frequency.exponentialRampToValueAtTime(880, now + 0.15); // A5
+
+        osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(880, now);
+        osc2.frequency.exponentialRampToValueAtTime(1174.66, now + 0.2); // D6
+
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.18, now + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc1.start(now);
+        osc2.start(now + 0.08);
+        osc1.stop(now + 0.5);
+        osc2.stop(now + 0.5);
+      } catch (e) {
+        // Audio playback restricted or unsupported, ignore gracefully
+      }
+    }
+
+    // --- 8. THREE.JS 3D BACKGROUND ENGINE ---
+    let threeScene, threeCamera, threeRenderer, coreMesh, nucleusMesh, particlesMesh;
+    const envelopeMeshes = [];
+    let isThreeInitialized = false;
+    let targetMouseX = 0, targetMouseY = 0;
+    let mouseX = 0, mouseY = 0;
+    let animFrameId = null;
+    let isPulseActive = false;
+    let pulseProgress = 0;
+    let activeFlyingEnvelope = null;
+
+    function initThreeJS() {
+      if (typeof THREE === 'undefined') {
+        console.warn('[DakBox] Three.js not loaded. Falling back to CSS mesh background.');
+        return;
+      }
+
+      const canvas = document.getElementById('three-canvas');
+      try {
+        threeScene = new THREE.Scene();
+        threeCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        threeCamera.position.z = 7;
+
+        threeRenderer = new THREE.WebGLRenderer({
+          canvas,
+          alpha: true,
+          antialias: true,
+          powerPreference: 'high-performance'
+        });
+        threeRenderer.setSize(window.innerWidth, window.innerHeight);
+        threeRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+        // Create Glowing Rotating Wireframe Icosahedron Core
+        const coreGeo = new THREE.IcosahedronGeometry(1.65, 1);
+        const wireColor = state.theme === 'dark' ? 0x10b981 : 0x0d9488;
+        const coreMat = new THREE.MeshBasicMaterial({
+          color: wireColor,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.75
+        });
+        coreMesh = new THREE.Mesh(coreGeo, coreMat);
+        threeScene.add(coreMesh);
+
+        // Inner glowing nucleus
+        const nucleusGeo = new THREE.IcosahedronGeometry(0.75, 0);
+        const nucleusMat = new THREE.MeshBasicMaterial({
+          color: state.theme === 'dark' ? 0x06b6d4 : 0x0284c7,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.4
+        });
+        nucleusMesh = new THREE.Mesh(nucleusGeo, nucleusMat);
+        threeScene.add(nucleusMesh);
+
+        // Orbiting Envelope-shaped 3D Geometries
+        const envelopeShape = createEnvelopeGeometry();
+        const envColor = state.theme === 'dark' ? 0x38bdf8 : 0x0f766e;
+        const envMat = new THREE.MeshBasicMaterial({
+          color: envColor,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.65
+        });
+
+        for (let i = 0; i < 6; i++) {
+          const mesh = new THREE.Mesh(envelopeShape, envMat.clone());
+          const radius = 2.8 + (i * 0.5);
+          const angle = (i / 6) * Math.PI * 2;
+          mesh.position.set(Math.cos(angle) * radius, (Math.random() - 0.5) * 2, Math.sin(angle) * radius);
+          mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+          mesh.userData = {
+            radius,
+            angle,
+            speed: 0.005 + (i * 0.0015),
+            rotSpeed: 0.01 + (Math.random() * 0.01),
+            baseY: mesh.position.y
+          };
+          envelopeMeshes.push(mesh);
+          threeScene.add(mesh);
+        }
+
+        // Drifting Particle System
+        const particleCount = window.innerWidth < 768 ? 120 : 320;
+        const particleGeo = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+
+        for (let i = 0; i < particleCount * 3; i += 3) {
+          positions[i] = (Math.random() - 0.5) * 26;
+          positions[i + 1] = (Math.random() - 0.5) * 26;
+          positions[i + 2] = (Math.random() - 0.5) * 20;
+        }
+        particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+        const particleMat = new THREE.PointsMaterial({
+          color: state.theme === 'dark' ? 0x38bdf8 : 0x0d9488,
+          size: 0.06,
+          transparent: true,
+          opacity: 0.5
+        });
+        particlesMesh = new THREE.Points(particleGeo, particleMat);
+        threeScene.add(particlesMesh);
+
+        isThreeInitialized = true;
+        setupThreeEvents();
+        startThreeAnimation();
+      } catch (err) {
+        console.warn('[DakBox] WebGL initialization failed or unsupported:', err);
+      }
+    }
+
+    // Helper: Build Envelope Geometry using wireframe plane & folded flap
+    function createEnvelopeGeometry() {
+      const geom = new THREE.BufferGeometry();
+      // Points for envelope rectangle with diagonal flap
+      const vertices = new Float32Array([
+        // Outer rectangle
+        -0.45, -0.3, 0,   0.45, -0.3, 0,
+        0.45, -0.3, 0,    0.45, 0.3, 0,
+        0.45, 0.3, 0,    -0.45, 0.3, 0,
+        -0.45, 0.3, 0,   -0.45, -0.3, 0,
+        // Fold lines
+        -0.45, 0.3, 0,    0, -0.05, 0.02,
+        0.45, 0.3, 0,     0, -0.05, 0.02,
+        -0.45, -0.3, 0,   0, -0.05, 0.02,
+        0.45, -0.3, 0,    0, -0.05, 0.02
+      ]);
+      geom.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+      return geom;
+    }
+
+    function setupThreeEvents() {
+      window.addEventListener('resize', () => {
+        if (!isThreeInitialized) return;
+        threeCamera.aspect = window.innerWidth / window.innerHeight;
+        threeCamera.updateProjectionMatrix();
+        threeRenderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        targetMouseX = (e.clientX / window.innerWidth) * 2 - 1;
+        targetMouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+      });
+
+      window.addEventListener('touchmove', (e) => {
+        if (e.touches.length > 0) {
+          targetMouseX = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
+          targetMouseY = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
+        }
+      }, { passive: true });
+    }
+
+    function startThreeAnimation() {
+      if (animFrameId) cancelAnimationFrame(animFrameId);
+
+      const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const animate = () => {
+        animFrameId = requestAnimationFrame(animate);
+
+        // Pause rendering if tab hidden to conserve CPU/battery
+        if (document.hidden) return;
+
+        if (!isReducedMotion) {
+          // Smooth mouse lerp
+          mouseX += (targetMouseX - mouseX) * 0.05;
+          mouseY += (targetMouseY - mouseY) * 0.05;
+
+          threeCamera.position.x = mouseX * 0.8;
+          threeCamera.position.y = mouseY * 0.8;
+          threeCamera.lookAt(threeScene.position);
+
+          // Rotate core
+          if (coreMesh) {
+            coreMesh.rotation.x += 0.003;
+            coreMesh.rotation.y += 0.005;
+          }
+          if (nucleusMesh) {
+            nucleusMesh.rotation.x -= 0.004;
+            nucleusMesh.rotation.y -= 0.006;
+          }
+
+          // Orbit envelopes
+          const time = Date.now() * 0.001;
+          envelopeMeshes.forEach(mesh => {
+            mesh.userData.angle += mesh.userData.speed;
+            mesh.position.x = Math.cos(mesh.userData.angle) * mesh.userData.radius;
+            mesh.position.z = Math.sin(mesh.userData.angle) * mesh.userData.radius;
+            mesh.position.y = mesh.userData.baseY + Math.sin(time + mesh.userData.radius) * 0.25;
+            mesh.rotation.x += mesh.userData.rotSpeed;
+            mesh.rotation.y += mesh.userData.rotSpeed * 0.7;
+          });
+
+          // Drift particles
+          if (particlesMesh) {
+            particlesMesh.rotation.y += 0.0008;
+          }
+
+          // Core pulse & incoming envelope fly-in on new email
+          if (isPulseActive) {
+            pulseProgress += 0.025;
+            const scale = 1 + Math.sin(pulseProgress * Math.PI) * 0.45;
+            if (coreMesh) coreMesh.scale.set(scale, scale, scale);
+
+            if (activeFlyingEnvelope) {
+              activeFlyingEnvelope.position.z += 0.12;
+              activeFlyingEnvelope.position.y += 0.01;
+              activeFlyingEnvelope.rotation.z += 0.04;
+              if (activeFlyingEnvelope.position.z > 5.5) {
+                threeScene.remove(activeFlyingEnvelope);
+                activeFlyingEnvelope = null;
+              }
+            }
+
+            if (pulseProgress >= 1) {
+              isPulseActive = false;
+              if (coreMesh) coreMesh.scale.set(1, 1, 1);
+            }
+          }
+        }
+
+        threeRenderer.render(threeScene, threeCamera);
+      };
+
+      animate();
+    }
+
+    // Triggered whenever a new mail arrives: Core pulses & envelope flies toward camera
+    function triggerThreeMailArrival() {
+      if (!isThreeInitialized) return;
+      isPulseActive = true;
+      pulseProgress = 0;
+
+      if (activeFlyingEnvelope) {
+        threeScene.remove(activeFlyingEnvelope);
+      }
+      const shape = createEnvelopeGeometry();
+      const mat = new THREE.MeshBasicMaterial({
+        color: state.theme === 'dark' ? 0x10b981 : 0x0d9488,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.95
+      });
+      activeFlyingEnvelope = new THREE.Mesh(shape, mat);
+      activeFlyingEnvelope.position.set(0, 0, 0.5);
+      activeFlyingEnvelope.scale.set(1.5, 1.5, 1.5);
+      threeScene.add(activeFlyingEnvelope);
+    }
+
+    function updateThreeTheme() {
+      if (!isThreeInitialized) return;
+      const wireColor = state.theme === 'dark' ? 0x10b981 : 0x0d9488;
+      const nucleusColor = state.theme === 'dark' ? 0x06b6d4 : 0x0284c7;
+      const envColor = state.theme === 'dark' ? 0x38bdf8 : 0x0f766e;
+
+      if (coreMesh) coreMesh.material.color.setHex(wireColor);
+      if (nucleusMesh) nucleusMesh.material.color.setHex(nucleusColor);
+      envelopeMeshes.forEach(m => m.material.color.setHex(envColor));
+      if (particlesMesh) particlesMesh.material.color.setHex(envColor);
+    }
+
+    // --- 9. ACCOUNT CREATION & SESSION MANAGEMENT ---
+    function generateRandomUsername() {
+      const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+      let suffix = '';
+      for (let i = 0; i < 8; i++) {
+        suffix += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return 'dak' + suffix;
+    }
+
+    function generateRandomPassword() {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+      const array = new Uint8Array(16);
+      crypto.getRandomValues(array);
+      let pwd = '';
+      for (let i = 0; i < 16; i++) {
+        pwd += chars.charAt(array[i] % chars.length);
+      }
+      return pwd;
+    }
+
+    async function loadDomains() {
+      try {
+        const domains = await Provider.getDomains();
+        state.domains = domains.filter(d => d.isActive);
+        populateDomainDropdown();
+      } catch (err) {
+        console.error('[DakBox] Failed to load domains:', err);
+      }
+    }
+
+    function populateDomainDropdown() {
+      const select = document.getElementById('select-domain');
+      select.innerHTML = '';
+      if (state.domains.length === 0) {
+        select.innerHTML = '<option value="">No domains available</option>';
+        return;
+      }
+      state.domains.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d.domain;
+        opt.textContent = '@' + d.domain;
+        select.appendChild(opt);
+      });
+    }
+
+    async function createNewInbox(customUser = null, chosenDomain = null) {
+      if (state.isCreatingAccount) return;
+      state.isCreatingAccount = true;
+      setLoadingButton('btn-new-random', true);
+      setLoadingButton('btn-create-custom', true);
+
+      try {
+        if (state.domains.length === 0) {
+          await loadDomains();
+        }
+
+        const domain = chosenDomain || (state.domains.length > 0 ? state.domains[0].domain : 'mail.tm');
+        const username = customUser ? customUser.toLowerCase().trim() : generateRandomUsername();
+        const address = `${username}@${domain}`;
+        const password = generateRandomPassword();
+
+        // 1. Create Account
+        const account = await Provider.createAccount(address, password);
+
+        // 2. Obtain Token
+        const tokenData = await Provider.getToken(address, password);
+
+        // 3. Store in State
+        const now = Date.now();
+        state.inbox = {
+          address,
+          password,
+          accountId: account.id,
+          token: tokenData.token,
+          provider: state.activeProvider,
+          createdAt: now,
+          expiresAt: now + (10 * 60 * 1000)
+        };
+
+        Storage.set('inbox', state.inbox);
+        addInboxToHistory(state.inbox);
+
+        // 4. Update UI & reset timer
+        renderInboxAddress();
+        resetExpiryTimer();
+        state.messages = [];
+        state.selectedMessage = null;
+        renderMessagesList();
+        renderMessageViewer();
+
+        showToast(`${t('your_temp_address')} ${address}`, 'success');
+        updatePageTitle();
+      } catch (err) {
+        console.error('[DakBox] Account creation error:', err);
+        let errorMsg = 'Failed to create email address. Please retry.';
+        if (err.data && err.data['violations']) {
+          errorMsg = err.data['violations'].map(v => v.message).join(' ');
+        }
+        showCustomError(errorMsg);
+        showToast(errorMsg, 'error');
+      } finally {
+        state.isCreatingAccount = false;
+        setLoadingButton('btn-new-random', false);
+        setLoadingButton('btn-create-custom', false);
+      }
+    }
+
+    async function restoreOrInitInbox() {
+      const saved = Storage.get('inbox');
+      if (saved && saved.address && saved.password) {
+        try {
+          state.inbox = saved;
+          renderInboxAddress();
+          renderHistoryDropdown();
+
+          // Validate token by re-logging in or fetching messages
+          const tokenData = await Provider.getToken(saved.address, saved.password);
+          state.inbox.token = tokenData.token;
+          Storage.set('inbox', state.inbox);
+
+          // Compute remaining timer or reset if expired
+          const remaining = Math.max(0, Math.floor((saved.expiresAt - Date.now()) / 1000));
+          state.timerSeconds = remaining > 0 ? remaining : 600;
+          startExpiryTimer();
+
+          await fetchMessages();
+          return;
+        } catch (e) {
+          console.warn('[DakBox] Saved session restoration failed. Creating fresh inbox...', e);
+        }
+      }
+
+      await loadDomains();
+      await createNewInbox();
+    }
+
+    function addInboxToHistory(inbox) {
+      let history = Storage.get('history', []);
+      history = history.filter(h => h.address !== inbox.address);
+      history.unshift({
+        address: inbox.address,
+        password: inbox.password,
+        accountId: inbox.accountId,
+        createdAt: inbox.createdAt
+      });
+      if (history.length > 5) history = history.slice(0, 5);
+      Storage.set('history', history);
+      state.history = history;
+      renderHistoryDropdown();
+    }
+
+    function renderHistoryDropdown() {
+      const select = document.getElementById('select-history');
+      const history = Storage.get('history', []);
+      select.innerHTML = `<option value="">${t('inbox_history')}</option>`;
+      history.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item.address;
+        opt.textContent = item.address;
+        if (state.inbox && state.inbox.address === item.address) {
+          opt.selected = true;
+        }
+        select.appendChild(opt);
+      });
+    }
+
+    // --- 10. REAL-TIME POLLING & MESSAGE SYNC ---
+    async function fetchMessages(isManual = false) {
+      if (!state.inbox || !state.inbox.token || state.isPolling) return;
+      state.isPolling = true;
+
+      const refreshBtn = document.getElementById('btn-refresh');
+      const refreshSvg = document.getElementById('icon-refresh-svg');
+      if (isManual) {
+        refreshSvg.classList.add('spin');
+        refreshBtn.disabled = true;
+      }
+
+      try {
+        const rawMessages = await Provider.listMessages(1);
+        const prevCount = state.messages.length;
+        const newMessages = [];
+
+        // Check for newly received emails
+        rawMessages.forEach(msg => {
+          const exists = state.messages.some(m => m.id === msg.id);
+          if (!exists) {
+            newMessages.push(msg);
+          }
+        });
+
+        state.messages = rawMessages;
+        renderMessagesList();
+        updatePageTitle();
+
+        // If new mails arrived
+        if (newMessages.length > 0) {
+          playNewMailChime();
+          triggerThreeMailArrival();
+
+          const newest = newMessages[0];
+          showToast(`${t('new_mail_toast')} ${newest.subject || 'No Subject'}`, 'success');
+
+          // Browser system notification if permitted
+          if (state.notificationsEnabled && Notification.permission === 'granted') {
+            try {
+              new Notification('DakBox — New Email', {
+                body: `${newest.from?.name || newest.from?.address || 'Unknown'}: ${newest.subject}`,
+                icon: document.querySelector("link[rel*='icon']").href
+              });
+            } catch (e) {}
+          }
+
+          // Auto-open newest mail ONLY IF inbox was previously empty
+          if (prevCount === 0 && rawMessages.length > 0) {
+            selectMessage(rawMessages[0].id);
+          }
+        }
+      } catch (err) {
+        console.error('[DakBox] Polling error:', err);
+      } finally {
+        state.isPolling = false;
+        if (isManual) {
+          setTimeout(() => {
+            refreshSvg.classList.remove('spin');
+            refreshBtn.disabled = false;
+          }, 400);
+        }
+      }
+    }
+
+    function setupPollingLoop() {
+      if (state.pollingInterval) clearInterval(state.pollingInterval);
+
+      const getIntervalMs = () => (document.hidden ? 20000 : 4000);
+
+      const loop = () => {
+        if (navigator.onLine && !document.hidden) {
+          fetchMessages();
+        }
+        state.pollingInterval = setTimeout(loop, getIntervalMs());
+      };
+
+      state.pollingInterval = setTimeout(loop, getIntervalMs());
+
+      // Immediate refresh on visibilitychange or online
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && navigator.onLine) {
+          fetchMessages();
+        }
+      });
+
+      window.addEventListener('online', () => {
+        updateServerStatus('online');
+        fetchMessages();
+      });
+
+      window.addEventListener('offline', () => {
+        updateServerStatus('offline');
+      });
+    }
+
+    // --- 11. EXPIRY TIMER (10 MINUTES COUNTDOWN) ---
+    function startExpiryTimer() {
+      if (state.timerInterval) clearInterval(state.timerInterval);
+
+      state.timerInterval = setInterval(() => {
+        state.timerSeconds--;
+        renderTimerDisplay();
+
+        if (state.timerSeconds <= 0) {
+          clearInterval(state.timerInterval);
+          showToast(t('inbox_expired_toast'), 'info');
+          createNewInbox();
+        }
+      }, 1000);
+      renderTimerDisplay();
+    }
+
+    function resetExpiryTimer() {
+      state.timerSeconds = 600;
+      if (state.inbox) {
+        state.inbox.expiresAt = Date.now() + (10 * 60 * 1000);
+        Storage.set('inbox', state.inbox);
+      }
+      startExpiryTimer();
+    }
+
+    function renderTimerDisplay() {
+      const min = Math.floor(state.timerSeconds / 60);
+      const sec = state.timerSeconds % 60;
+      const formatted = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+      const el = document.getElementById('timer-text');
+      if (el) el.textContent = formatted;
+    }
+
+    // --- 12. UI RENDERING & INTERACTIONS ---
+    function renderInboxAddress() {
+      const addrEl = document.getElementById('email-address-text');
+      if (state.inbox && state.inbox.address) {
+        addrEl.textContent = state.inbox.address;
+      } else {
+        addrEl.textContent = 'Generating temporary email...';
+      }
+    }
+
+    function updatePageTitle() {
+      const unreadCount = state.messages.filter(m => !m.seen).length;
+      if (unreadCount > 0) {
+        document.title = `(${unreadCount}) DakBox — Temporary Email`;
+      } else {
+        document.title = 'DakBox — Real-Time Disposable Temporary Email Service';
+      }
+      const badge = document.getElementById('unread-count-badge');
+      if (badge) badge.textContent = `(${unreadCount})`;
+    }
+
+    function updateServerStatus(status) {
+      state.serverStatus = status;
+      const dot = document.getElementById('status-dot');
+      const text = document.getElementById('status-text');
+
+      dot.className = 'status-dot';
+      if (status === 'online') {
+        text.textContent = t('server_online');
+      } else if (status === 'switching') {
+        dot.classList.add('switching');
+        text.textContent = t('server_switching');
+      } else {
+        dot.classList.add('offline');
+        text.textContent = t('server_offline');
+      }
+    }
+
+    function renderMessagesList() {
+      const container = document.getElementById('messages-container');
+      if (!container) return;
+
+      // Filter by search query
+      const query = state.searchQuery.toLowerCase().trim();
+      const filtered = state.messages.filter(m => {
+        if (!query) return true;
+        const sender = `${m.from?.name || ''} ${m.from?.address || ''}`.toLowerCase();
+        const subject = (m.subject || '').toLowerCase();
+        return sender.includes(query) || subject.includes(query);
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" id="empty-state" style="display:flex;">
+            <div class="empty-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+            </div>
+            <p data-i18n="empty_state_text">
+              ${escapeHtml(t('empty_state_text'))}
+            </p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = '';
+
+      filtered.forEach(msg => {
+        const item = document.createElement('div');
+        item.className = `message-item ${!msg.seen ? 'unread' : ''} ${state.selectedMessage && state.selectedMessage.id === msg.id ? 'active' : ''}`;
+        item.setAttribute('role', 'button');
+        item.setAttribute('tabindex', '0');
+
+        // Check for OTP in intro / subject
+        const otp = extractOtp(msg.subject, msg.intro, '', '');
+
+        const senderName = escapeHtml(msg.from?.name || msg.from?.address || 'Unknown Sender');
+        const subjectText = escapeHtml(msg.subject || '(No Subject)');
+        const introText = escapeHtml(msg.intro || '');
+        const dateStr = formatTime(msg.createdAt);
+
+        let badgesHtml = '';
+        if (otp) {
+          badgesHtml += `<span class="otp-chip"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> ${escapeHtml(otp)}</span>`;
+        }
+        if (msg.hasAttachments) {
+          badgesHtml += `<span class="link-chip"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg> File</span>`;
+        }
+
+        item.innerHTML = `
+          <div class="msg-header-row">
+            <span class="msg-sender">${senderName}</span>
+            <span class="msg-date">${dateStr}</span>
+          </div>
+          <div class="msg-subject">${subjectText}</div>
+          <div class="msg-intro">${introText}</div>
+          ${badgesHtml ? `<div class="msg-badges-row">${badgesHtml}</div>` : ''}
+        `;
+
+        item.addEventListener('click', () => selectMessage(msg.id));
+        item.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            selectMessage(msg.id);
+          }
+        });
+
+        container.appendChild(item);
+      });
+    }
+
+    async function selectMessage(id) {
+      const msg = state.messages.find(m => m.id === id);
+      if (!msg) return;
+
+      state.selectedMessage = msg;
+      msg.seen = true;
+      updatePageTitle();
+      renderMessagesList();
+
+      // Show mobile view transition
+      const workspace = document.getElementById('inbox-workspace');
+      workspace.classList.add('viewing-mail');
+
+      document.getElementById('viewer-placeholder').style.display = 'none';
+      document.getElementById('viewer-content').style.display = 'flex';
+
+      // Set initial headers
+      document.getElementById('view-subject').textContent = msg.subject || '(No Subject)';
+      document.getElementById('view-from').textContent = `${msg.from?.name || ''} <${msg.from?.address || ''}>`;
+      document.getElementById('view-date').textContent = new Date(msg.createdAt).toLocaleString();
+
+      // Fetch full message details with HTML body and attachments
+      try {
+        const fullMsg = await Provider.getMessage(id);
+        state.selectedMessageDetails = fullMsg;
+        renderFullMessage(fullMsg);
+      } catch (err) {
+        console.error('[DakBox] Failed to fetch message details:', err);
+        showToast('Failed to load email body', 'error');
+      }
+    }
+
+    function renderFullMessage(fullMsg) {
+      const htmlBody = fullMsg.html && fullMsg.html.length > 0 ? fullMsg.html[0] : '';
+      const textBody = fullMsg.text || fullMsg.intro || '';
+
+      // OTP Detection
+      const otp = extractOtp(fullMsg.subject, fullMsg.intro, textBody, htmlBody);
+      const otpBanner = document.getElementById('otp-banner');
+      if (otp) {
+        document.getElementById('otp-value-text').textContent = otp;
+        otpBanner.style.display = 'flex';
+      } else {
+        otpBanner.style.display = 'none';
+      }
+
+      // Verification Link Detection
+      const verifyLink = extractVerificationLink(textBody, htmlBody);
+      const linkBanner = document.getElementById('link-banner');
+      const linkBtn = document.getElementById('btn-open-link');
+      if (verifyLink) {
+        linkBtn.href = verifyLink;
+        linkBanner.style.display = 'flex';
+      } else {
+        linkBanner.style.display = 'none';
+      }
+
+      // Attachments
+      const attachRow = document.getElementById('attachments-row');
+      const attachList = document.getElementById('attachments-list');
+      attachList.innerHTML = '';
+      if (fullMsg.attachments && fullMsg.attachments.length > 0) {
+        fullMsg.attachments.forEach(att => {
+          const chip = document.createElement('button');
+          chip.className = 'attach-chip';
+          const sizeKb = Math.round((att.size || 0) / 1024);
+          chip.innerHTML = `
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+            <span>${escapeHtml(att.filename)} (${sizeKb} KB)</span>
+          `;
+          chip.addEventListener('click', () => {
+            Provider.downloadAttachment(att.downloadUrl, att.filename);
+          });
+          attachList.appendChild(chip);
+        });
+        attachRow.style.display = 'flex';
+      } else {
+        attachRow.style.display = 'none';
+      }
+
+      // Render Body inside Sandboxed Iframe
+      const iframe = document.getElementById('mail-iframe');
+      const plainPre = document.getElementById('mail-plain-text');
+      plainPre.textContent = textBody;
+
+      renderMailHtmlToIframe(iframe, htmlBody || `<div style="font-family:sans-serif; padding:16px;">${escapeHtml(textBody)}</div>`);
+
+      // Plain Text vs HTML mode toggle state
+      if (state.isViewPlain) {
+        iframe.style.display = 'none';
+        plainPre.style.display = 'block';
+      } else {
+        iframe.style.display = 'block';
+        plainPre.style.display = 'none';
+      }
+
+      // Populate print content
+      document.getElementById('print-subject').textContent = fullMsg.subject || '';
+      document.getElementById('print-from').textContent = `${fullMsg.from?.name || ''} <${fullMsg.from?.address || ''}>`;
+      document.getElementById('print-date').textContent = new Date(fullMsg.createdAt).toLocaleString();
+      document.getElementById('print-body').innerHTML = htmlBody || `<pre>${escapeHtml(textBody)}</pre>`;
+    }
+
+    function renderMailHtmlToIframe(iframe, rawHtml) {
+      const isDark = state.theme === 'dark';
+      const bg = isDark ? '#0b1120' : '#ffffff';
+      const text = isDark ? '#e2e8f0' : '#1e293b';
+      const linkColor = isDark ? '#38bdf8' : '#0284c7';
+
+      const styledDoc = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <base target="_blank">
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+              font-size: 14.5px;
+              line-height: 1.6;
+              color: ${text};
+              background-color: ${bg};
+              margin: 20px;
+              word-break: break-word;
+            }
+            a { color: ${linkColor}; text-decoration: underline; }
+            img { max-width: 100% !important; height: auto !important; }
+            table { max-width: 100% !important; }
+          </style>
+        </head>
+        <body>${rawHtml}</body>
+        </html>
+      `;
+      iframe.srcdoc = styledDoc;
+    }
+
+    function renderMessageViewer() {
+      if (!state.selectedMessage) {
+        document.getElementById('viewer-placeholder').style.display = 'flex';
+        document.getElementById('viewer-content').style.display = 'none';
+        document.getElementById('inbox-workspace').classList.remove('viewing-mail');
+      }
+    }
+
+    // --- 13. ALL ACTION HANDLERS ---
+    // Copy Email to clipboard with fallback
+    async function copyEmailAddress() {
+      if (!state.inbox || !state.inbox.address) return;
+      const addr = state.inbox.address;
+      let success = false;
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+          await navigator.clipboard.writeText(addr);
+          success = true;
+        } catch (e) {}
+      }
+
+      if (!success) {
+        // Fallback using hidden textarea
+        const textarea = document.createElement('textarea');
+        textarea.value = addr;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+          document.execCommand('copy');
+          success = true;
+        } catch (e) {}
+        document.body.removeChild(textarea);
+      }
+
+      // Visual Feedback
+      const label = document.getElementById('copy-label');
+      label.textContent = t('copied');
+      showToast(t('copied'), 'success');
+      setTimeout(() => {
+        label.textContent = t('copy');
+      }, 1500);
+    }
+
+    // Copy OTP Code
+    function copyOtpCode() {
+      const otpText = document.getElementById('otp-value-text').textContent;
+      if (!otpText) return;
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(otpText);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = otpText;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      showToast(t('otp_copied'), 'success');
+    }
+
+    // Web Share API
+    async function shareAddress() {
+      if (!state.inbox) return;
+      const shareData = {
+        title: 'DakBox Temporary Email',
+        text: `My temporary email is: ${state.inbox.address}`
+      };
+      if (navigator.share) {
+        try {
+          await navigator.share(shareData);
+        } catch (e) {}
+      } else {
+        copyEmailAddress();
+      }
+    }
+
+    // Export Email as .txt
+    function exportActiveMail() {
+      if (!state.selectedMessageDetails) return;
+      const m = state.selectedMessageDetails;
+      const content = `Subject: ${m.subject}\nFrom: ${m.from?.name || ''} <${m.from?.address || ''}>\nDate: ${new Date(m.createdAt).toLocaleString()}\n\n-------------------------\n\n${m.text || m.intro || ''}`;
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `dakbox-email-${m.id.substring(0, 8)}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    }
+
+    // Print Mail
+    function printActiveMail() {
+      window.print();
+    }
+
+    // Delete single mail
+    async function deleteActiveMail() {
+      if (!state.selectedMessage) return;
+      const id = state.selectedMessage.id;
+      try {
+        await Provider.deleteMessage(id);
+        state.messages = state.messages.filter(m => m.id !== id);
+        state.selectedMessage = null;
+        state.selectedMessageDetails = null;
+        renderMessagesList();
+        renderMessageViewer();
+        updatePageTitle();
+        showToast('Email deleted', 'info');
+      } catch (err) {
+        console.error('[DakBox] Failed to delete mail:', err);
+        showToast('Failed to delete email', 'error');
+      }
+    }
+
+    // Delete all mails
+    async function deleteAllMails() {
+      if (state.messages.length === 0) return;
+      const count = state.messages.length;
+      try {
+        for (const msg of state.messages) {
+          await Provider.deleteMessage(msg.id);
+        }
+        state.messages = [];
+        state.selectedMessage = null;
+        state.selectedMessageDetails = null;
+        renderMessagesList();
+        renderMessageViewer();
+        updatePageTitle();
+        showToast(`Deleted ${count} messages`, 'info');
+      } catch (err) {
+        console.error('[DakBox] Error deleting all messages:', err);
+      }
+    }
+
+    // Delete inbox and renew
+    async function deleteInboxAndRenew() {
+      if (!state.inbox) return;
+      const id = state.inbox.accountId;
+      try {
+        await Provider.deleteAccount(id);
+      } catch (err) {
+        console.warn('[DakBox] Account delete API call failed:', err);
+      } finally {
+        Storage.remove('inbox');
+        await createNewInbox();
+      }
+    }
+
+    // Toggle Language (EN / UR)
+    function toggleLanguage() {
+      state.lang = state.lang === 'en' ? 'ur' : 'en';
+      Storage.set('lang', state.lang);
+      applyLanguage();
+    }
+
+    function applyLanguage() {
+      const html = document.documentElement;
+      html.lang = state.lang;
+      html.dir = state.lang === 'ur' ? 'rtl' : 'ltr';
+
+      document.getElementById('lang-label').textContent = state.lang === 'en' ? 'اردو' : 'EN';
+      document.getElementById('search-input').placeholder = t('search_placeholder');
+
+      // Update all elements with data-i18n
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (key && I18N[state.lang][key]) {
+          el.textContent = I18N[state.lang][key];
+        }
+      });
+
+      updateServerStatus(state.serverStatus);
+      renderTimerDisplay();
+    }
+
+    function t(key) {
+      return (I18N[state.lang] && I18N[state.lang][key]) || (I18N['en'] && I18N['en'][key]) || key;
+    }
+
+    // Toggle Theme (Dark / Light)
+    function toggleTheme() {
+      state.theme = state.theme === 'dark' ? 'light' : 'dark';
+      Storage.set('theme', state.theme);
+      applyTheme();
+    }
+
+    function applyTheme() {
+      document.documentElement.setAttribute('data-theme', state.theme);
+      const moon = document.getElementById('icon-moon');
+      const sun = document.getElementById('icon-sun');
+      if (state.theme === 'dark') {
+        moon.style.display = 'block';
+        sun.style.display = 'none';
+      } else {
+        moon.style.display = 'none';
+        sun.style.display = 'block';
+      }
+
+      updateThreeTheme();
+
+      // If mail iframe is open, update iframe styles
+      if (state.selectedMessageDetails) {
+        const iframe = document.getElementById('mail-iframe');
+        const html = state.selectedMessageDetails.html && state.selectedMessageDetails.html[0];
+        if (html) renderMailHtmlToIframe(iframe, html);
+      }
+    }
+
+    // Audio chime toggle
+    function toggleSound() {
+      state.soundEnabled = !state.soundEnabled;
+      Storage.set('soundEnabled', state.soundEnabled);
+      const on = document.getElementById('icon-sound-on');
+      const off = document.getElementById('icon-sound-off');
+      if (state.soundEnabled) {
+        on.style.display = 'block';
+        off.style.display = 'none';
+      } else {
+        on.style.display = 'none';
+        off.style.display = 'block';
+      }
+    }
+
+    // Browser Notification Toggle
+    async function toggleNotifications() {
+      if (!('Notification' in window)) {
+        showToast('Browser notifications not supported', 'error');
+        return;
+      }
+      if (Notification.permission === 'granted') {
+        state.notificationsEnabled = !state.notificationsEnabled;
+        showToast(state.notificationsEnabled ? 'Notifications enabled' : 'Notifications disabled', 'info');
+      } else {
+        const perm = await Notification.requestPermission();
+        if (perm === 'granted') {
+          state.notificationsEnabled = true;
+          showToast('Notifications enabled', 'success');
+        } else {
+          state.notificationsEnabled = false;
+          showToast('Notification permission denied', 'error');
+        }
+      }
+      Storage.set('notificationsEnabled', state.notificationsEnabled);
+    }
+
+    // Toast Utility
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        toast.style.transition = 'all 0.25s ease';
+        setTimeout(() => toast.remove(), 250);
+      }, 3200);
+    }
+
+    function showCustomError(msg) {
+      const el = document.getElementById('custom-error-msg');
+      el.textContent = msg;
+      el.classList.add('visible');
+      setTimeout(() => el.classList.remove('visible'), 5000);
+    }
+
+    function setLoadingButton(id, loading) {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+      btn.disabled = loading;
+      if (loading) {
+        btn.dataset.prevHtml = btn.innerHTML;
+        btn.innerHTML = `<span class="spin" style="display:inline-block; width:16px; height:16px; border:2px solid currentColor; border-top-color:transparent; border-radius:50%;"></span>`;
+      } else if (btn.dataset.prevHtml) {
+        btn.innerHTML = btn.dataset.prevHtml;
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function formatTime(isoStr) {
+      if (!isoStr) return '';
+      const date = new Date(isoStr);
+      const now = new Date();
+      if (date.toDateString() === now.toDateString()) {
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+      return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    }
+
+    // --- 14. EVENT LISTENERS & KEYBOARD SHORTCUTS ---
+    function setupAppEvents() {
+      // Address Box Copy
+      document.getElementById('address-box').addEventListener('click', copyEmailAddress);
+      document.getElementById('btn-copy-main').addEventListener('click', copyEmailAddress);
+
+      // New Random Email
+      document.getElementById('btn-new-random').addEventListener('click', () => createNewInbox());
+
+      // Share Button
+      document.getElementById('btn-share').addEventListener('click', shareAddress);
+
+      // Delete Inbox Modal Flow
+      const deleteModal = document.getElementById('confirm-delete-modal');
+      document.getElementById('btn-delete-inbox').addEventListener('click', () => {
+        deleteModal.classList.add('open');
+      });
+      document.getElementById('btn-cancel-delete').addEventListener('click', () => {
+        deleteModal.classList.remove('open');
+      });
+      document.getElementById('btn-confirm-delete').addEventListener('click', async () => {
+        deleteModal.classList.remove('open');
+        await deleteInboxAndRenew();
+      });
+
+      // Custom Username Creation
+      document.getElementById('btn-create-custom').addEventListener('click', handleCustomUsernameSubmit);
+      document.getElementById('input-custom-username').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') handleCustomUsernameSubmit();
+      });
+
+      // Extend Timer
+      document.getElementById('btn-extend-timer').addEventListener('click', () => {
+        resetExpiryTimer();
+        showToast('Timer extended by +10 minutes', 'success');
+      });
+
+      // History Select
+      document.getElementById('select-history').addEventListener('change', async (e) => {
+        const selectedAddr = e.target.value;
+        if (!selectedAddr) return;
+        const history = Storage.get('history', []);
+        const found = history.find(h => h.address === selectedAddr);
+        if (found) {
+          try {
+            showToast(`Switching to ${found.address}...`, 'info');
+            const tokenData = await Provider.getToken(found.address, found.password);
+            state.inbox = {
+              address: found.address,
+              password: found.password,
+              accountId: found.accountId,
+              token: tokenData.token,
+              provider: state.activeProvider,
+              createdAt: found.createdAt,
+              expiresAt: Date.now() + (10 * 60 * 1000)
+            };
+            Storage.set('inbox', state.inbox);
+            renderInboxAddress();
+            resetExpiryTimer();
+            state.messages = [];
+            state.selectedMessage = null;
+            await fetchMessages();
+          } catch (err) {
+            showToast('Failed to switch back to selected inbox', 'error');
+          }
+        }
+      });
+
+      // Refresh Messages
+      document.getElementById('btn-refresh').addEventListener('click', () => fetchMessages(true));
+
+      // Mark All Read
+      document.getElementById('btn-mark-all-read').addEventListener('click', () => {
+        state.messages.forEach(m => m.seen = true);
+        renderMessagesList();
+        updatePageTitle();
+        showToast('Marked all as read', 'info');
+      });
+
+      // Delete All Messages
+      document.getElementById('btn-delete-all-mails').addEventListener('click', deleteAllMails);
+
+      // Search Box Filter
+      const searchInput = document.getElementById('search-input');
+      const searchClear = document.getElementById('search-clear-btn');
+      searchInput.addEventListener('input', (e) => {
+        state.searchQuery = e.target.value;
+        if (state.searchQuery) {
+          searchClear.classList.add('active');
+        } else {
+          searchClear.classList.remove('active');
+        }
+        renderMessagesList();
+      });
+
+      searchClear.addEventListener('click', () => {
+        searchInput.value = '';
+        state.searchQuery = '';
+        searchClear.classList.remove('active');
+        renderMessagesList();
+        searchInput.focus();
+      });
+
+      // Mobile Back to Inbox
+      document.getElementById('btn-back-inbox').addEventListener('click', () => {
+        document.getElementById('inbox-workspace').classList.remove('viewing-mail');
+        state.selectedMessage = null;
+        renderMessagesList();
+      });
+
+      // Toggle Plain Text vs HTML
+      const togglePlainBtn = document.getElementById('btn-toggle-plain');
+      togglePlainBtn.addEventListener('click', () => {
+        state.isViewPlain = !state.isViewPlain;
+        togglePlainBtn.textContent = state.isViewPlain ? t('html_view') : t('plain_text');
+        const iframe = document.getElementById('mail-iframe');
+        const pre = document.getElementById('mail-plain-text');
+        if (state.isViewPlain) {
+          iframe.style.display = 'none';
+          pre.style.display = 'block';
+        } else {
+          iframe.style.display = 'block';
+          pre.style.display = 'none';
+        }
+      });
+
+      // Mail Action Buttons
+      document.getElementById('btn-export-txt').addEventListener('click', exportActiveMail);
+      document.getElementById('btn-print-mail').addEventListener('click', printActiveMail);
+      document.getElementById('btn-delete-active-mail').addEventListener('click', deleteActiveMail);
+      document.getElementById('btn-copy-otp').addEventListener('click', copyOtpCode);
+
+      // Header Controls
+      document.getElementById('btn-lang').addEventListener('click', toggleLanguage);
+      document.getElementById('btn-theme').addEventListener('click', toggleTheme);
+      document.getElementById('btn-sound').addEventListener('click', toggleSound);
+      document.getElementById('btn-notify').addEventListener('click', toggleNotifications);
+
+      // Shortcuts Modal
+      const shortcutsModal = document.getElementById('shortcuts-modal');
+      document.getElementById('btn-shortcuts').addEventListener('click', () => {
+        shortcutsModal.classList.add('open');
+      });
+      document.getElementById('btn-close-shortcuts').addEventListener('click', () => {
+        shortcutsModal.classList.remove('open');
+      });
+
+      // FAQ Accordion
+      document.querySelectorAll('.faq-question').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const item = btn.parentElement;
+          item.classList.toggle('open');
+        });
+      });
+
+      // Keyboard Shortcuts Listener
+      window.addEventListener('keydown', (e) => {
+        // Do not intercept when typing in input or textarea
+        if (['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+          if (e.key === 'Escape') {
+            document.activeElement.blur();
+          }
+          return;
+        }
+
+        switch (e.key.toLowerCase()) {
+          case 'c':
+            e.preventDefault();
+            copyEmailAddress();
+            break;
+          case 'r':
+            e.preventDefault();
+            fetchMessages(true);
+            break;
+          case 'n':
+            e.preventDefault();
+            createNewInbox();
+            break;
+          case '/':
+            e.preventDefault();
+            document.getElementById('search-input').focus();
+            break;
+          case 'escape':
+            // Dismiss modals or exit mobile mail viewer
+            shortcutsModal.classList.remove('open');
+            deleteModal.classList.remove('open');
+            if (document.getElementById('inbox-workspace').classList.contains('viewing-mail')) {
+              document.getElementById('inbox-workspace').classList.remove('viewing-mail');
+            }
+            break;
+          case '?':
+            e.preventDefault();
+            shortcutsModal.classList.toggle('open');
+            break;
+        }
+      });
+    }
+
+    async function handleCustomUsernameSubmit() {
+      const input = document.getElementById('input-custom-username');
+      const domainSelect = document.getElementById('select-domain');
+      const val = input.value.trim().toLowerCase();
+      const domain = domainSelect.value;
+
+      // Validation: 3-24 characters, a-z 0-9 . _ -
+      const regex = /^[a-z0-9._-]{3,24}$/;
+      if (!regex.test(val)) {
+        showCustomError('Invalid username: Must be 3-24 characters, using letters, numbers, dot, dash, or underscore.');
+        return;
+      }
+      if (!domain) {
+        showCustomError('Please select a domain.');
+        return;
+      }
+
+      await createNewInbox(val, domain);
+      input.value = '';
+    }
+
+    // --- 15. GLOBAL ERROR HANDLERS ---
+    window.onerror = function(msg, url, line) {
+      console.warn('[DakBox Uncaught Error]', msg, line);
+      showToast('Network issue encountered, retrying automatically...', 'info');
+      return true;
+    };
+
+    window.onunhandledrejection = function(e) {
+      console.warn('[DakBox Unhandled Promise Rejection]', e.reason);
+      showToast('Connection interrupted, retrying...', 'info');
+      e.preventDefault();
+    };
+
+    // --- 16. INITIALIZATION BOOTSTRAP ---
+    window.addEventListener('DOMContentLoaded', async () => {
+      // 1. Restore Preferences
+      const savedTheme = Storage.get('theme', window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      state.theme = savedTheme;
+      applyTheme();
+
+      const savedLang = Storage.get('lang', 'en');
+      state.lang = savedLang;
+      applyLanguage();
+
+      state.soundEnabled = Storage.get('soundEnabled', true);
+      const on = document.getElementById('icon-sound-on');
+      const off = document.getElementById('icon-sound-off');
+      if (state.soundEnabled) {
+        on.style.display = 'block';
+        off.style.display = 'none';
+      } else {
+        on.style.display = 'none';
+        off.style.display = 'block';
+      }
+
+      state.notificationsEnabled = Storage.get('notificationsEnabled', false);
+
+      // 2. Initialize 3D Engine
+      initThreeJS();
+
+      // 3. Setup UI Event Handlers
+      setupAppEvents();
+
+      // 4. Restore or Generate Inbox
+      await restoreOrInitInbox();
+
+      // 5. Start Polling Loop
+      setupPollingLoop();
+    });
+  </script>
+</body>
+</html>
