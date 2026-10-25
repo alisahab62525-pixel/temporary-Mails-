@@ -1,0 +1,3 @@
+/api/mail-primary/* https://api.mail.tm/:splat 200
+/api/mail-fallback/* https://api.mail.gw/:splat 200
+/* /index.html 200

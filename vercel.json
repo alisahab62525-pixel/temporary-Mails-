@@ -1,0 +1,19 @@
+{
+  "framework": "vite",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/api/mail-primary/:path*",
+      "destination": "/api/mail-primary/:path*"
+    },
+    {
+      "source": "/api/mail-fallback/:path*",
+      "destination": "/api/mail-fallback/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
