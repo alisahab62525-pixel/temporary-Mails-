@@ -1971,7 +1971,22 @@
         }
 
         if (response.status === 204) return null; // No Content
-        return await response.json();
+
+        // Check if response is actually JSON or an HTML fallback from static host
+        const contentType = (response.headers.get('content-type') || '').toLowerCase();
+        if (contentType && !contentType.includes('json') && !contentType.includes('problem')) {
+          const err = new Error('Received non-JSON response from server (possible static rewrite)');
+          err.status = 404;
+          throw err;
+        }
+
+        try {
+          return await response.json();
+        } catch (jsonErr) {
+          const err = new Error('Invalid JSON format received');
+          err.status = 404;
+          throw err;
+        }
       } catch (err) {
         clearTimeout(timeoutId);
         if (err.name === 'AbortError') {
@@ -2012,7 +2027,8 @@
           await new Promise(r => setTimeout(r, 600));
           updateServerStatus('online');
         } else {
-          console.warn('[DakBox] Both providers encountered issues.');
+          console.warn('[DakBox] Both providers encountered issues. Re-trying primary next...');
+          state.activeProvider = 'primary';
           updateServerStatus('offline');
         }
       },
@@ -2034,10 +2050,14 @@
           if (body) options.body = JSON.stringify(body);
 
           try {
-            return await safeFetch(url, options);
+            const data = await safeFetch(url, options);
+            if (state.serverStatus !== 'online') {
+              updateServerStatus('online');
+            }
+            return data;
           } catch (err) {
-            // If proxy is active and returns 404 or 405 (e.g. static hosting without backend proxy), fallback to direct API
-            if (this.useProxy && (err.status === 404 || err.status === 405)) {
+            // If proxy is active and returns 404, 405, or 502, toggle to direct API and retry
+            if (this.useProxy && (err.status === 404 || err.status === 405 || err.status === 502)) {
               console.warn('[DakBox] Proxy unavailable on this host, falling back to direct API...');
               this.useProxy = false;
               url = `${this.getBaseUrl()}${endpoint}`;
